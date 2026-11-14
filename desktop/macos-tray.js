@@ -122,6 +122,7 @@ function run(argv) {
   for (var i = 0; i < 13; i++) {
     if (i === 2 || i === 7 || i === 12) { menu.addItem($.NSMenuItem.separatorItem); rowItems.push(null); }
     else { var row = item('—'); rowItems.push(row); menu.addItem(row); }
+    if (i >= 8) menu.itemAtIndex(i).hidden = true;
   }
   refreshItem = item('Refresh', 'refresh:'); menu.addItem(refreshItem);
   var languages = item('Language / 语言'); languages.enabled = true;

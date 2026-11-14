@@ -37,6 +37,7 @@ try {
   assert.equal(prefs.enabled, false);
   await until(async () => ['running','shared'].includes(await status(second)));
   await first.close();
+  await until(async () => (await status(second)) === 'running');
   await second.close();
   await until(async () => (await locks()).length === 0);
   console.log(process.platform.toUpperCase() + '_PLUGIN_LIFECYCLE_OK: bundled launcher, Unicode profile, two clients, hide, restart, cleanup');

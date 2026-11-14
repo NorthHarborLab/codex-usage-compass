@@ -28,6 +28,7 @@ public static class UsageCompassTray {
         for (int i = 0; i < 13; i++) {
             if (i == 2 || i == 7 || i == 12) menu.Items.Add(new ToolStripSeparator());
             else menu.Items.Add(new ToolStripMenuItem("…") { Enabled = false });
+            if (i >= 8) menu.Items[i].Available = false;
         }
         refresh = new ToolStripMenuItem("Refresh");
         refresh.Click += delegate { Send("{\"action\":\"refresh\"}"); };

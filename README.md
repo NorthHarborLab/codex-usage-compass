@@ -2,8 +2,8 @@
 
 [简体中文](README.zh-CN.md)
 
-[Download v0.4.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.4.0)
-A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and an automatic Ubuntu panel / Windows 10+ tray ring.
+[Download v0.5.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.5.0)
+A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and an automatic Ubuntu panel / Windows 10+ tray / macOS menu bar ring.
 
 ## Preview
 
@@ -28,11 +28,12 @@ Add this GitHub project as a plugin marketplace in Codex desktop, then install *
 The plugin contains the desktop renderer. Its first local MCP service startup automatically starts the ring, with no companion installation command. If the host has not loaded the service yet, open the quota panel once. Codex does not expose an install-completed callback; startup is tied to the loaded service. Local execution must be allowed by the host. Use signed-in local Codex and its bundled Node runtime, or Node.js 20+ for CLI setups.
 
 - **Ubuntu GNOME:** coloured top-panel ring and remaining quota. Requires GJS, GTK3, AppIndicator/Ayatana and the enabled GNOME AppIndicator extension. When packages are missing, click **Install desktop support** in the panel and approve the OS authorization dialog. This uses Ubuntu apt; a newly installed GNOME extension may require enabling it and logging in again.
+- **macOS (Intel and Apple Silicon):** native menu bar ring with remaining quota, hover summary and a click menu for countdowns, refresh, language and hide. Uses the built-in `/usr/bin/osascript` JavaScript bridge and AppKit; no Xcode, Homebrew package or separate companion app is required. Requires a local logged-in graphical session. Node.js comes from the Codex host when provided, otherwise Node.js 20+ must be available (Homebrew Node paths are also detected). The renderer does not automate other apps or request Accessibility / Screen Recording access. No login item or LaunchAgent is installed.
 - **Windows 10 / 11:** native notification-area ring, hover summary, and left/right click menu for both windows, countdowns, advice, refresh and language. Check the taskbar's `^` hidden-icon area if necessary. Uses built-in Windows PowerShell 5.1 and .NET Framework; no GJS, Python, or execution-policy changes. Native Windows Codex is required; remote Linux/WSL sessions cannot directly render this tray.
 
 Multiple chats share one ring. Hide it from the menu or panel and restore it from the panel. The choice persists. The ring exits after all plugin services stop; closing only the quota panel does not unload the service. No extra login task, registry startup entry, or system service is created. Upgrading stops this project's legacy standalone Linux service to prevent duplicate icons.
 
-Optional local-archive installation:
+Optional Ubuntu local-archive installation:
 
 ```sh
 sh scripts/install-linux.sh
@@ -48,7 +49,7 @@ Uninstall in Codex plugin management. The ring exits when the service unloads; a
 sh scripts/uninstall-linux.sh all
 ```
 
-Preferences remain at `~/.config/codex-usage-compass/preferences.json` on Linux or `%LOCALAPPDATA%\codex-usage-compass\preferences.json` on Windows. Remove this file to restore automatic display.
+Preferences remain at `~/.config/codex-usage-compass/preferences.json` on Linux, `~/Library/Application Support/codex-usage-compass/preferences.json` on macOS, or `%LOCALAPPDATA%\codex-usage-compass\preferences.json` on Windows. Remove this file to restore automatic display.
 
 ## Languages
 
@@ -69,13 +70,13 @@ English and Simplified Chinese are fully translated in the panel and indicator, 
 | 100–<150% | Green | Comfortable reserve for more demanding tasks |
 | ≥150% | Cyan | Consider a stronger model or Fast mode if available |
 
-The ring is capped at a full circle. Its centre shows actual remaining quota. Suggestions consider both available windows and use the tighter budget. A reserve of 5% or less overrides encouragement to spend more. Expired or stale data suppresses spending suggestions. Missing windows display “No data available” and never imply an unlimited allowance.
+The ring is capped at a full circle. Its centre shows actual remaining quota. Suggestions consider both available windows and use the tighter budget. A reserve of 5% or less overrides encouragement to spend more. Expired or stale data suppresses spending suggestions. The dashboard labels missing windows “No data available”. System menus hide the entire 5-hour block while that window is absent, and show it again when data arrives. A known exhausted or expired window stays visible; missing data never implies an unlimited allowance.
 
 This is a steady-pacing heuristic. It does not learn habits or predict model costs. It does not change models or speed settings. A higher speed can consume quota differently depending on the product and plan. Timers update each second; usage refreshes every minute.
 
 ## Platform support
 
-Ubuntu GNOME uses GJS/GTK3/AppIndicator; Windows 10+ uses native WinForms NotifyIcon. The Windows smoke and lifecycle tests run on GitHub Actions Windows Server 2022. Windows 10/11 interactive desktop acceptance is still pending. macOS has no system-ring implementation. See VERIFICATION.md for exact coverage.
+Ubuntu GNOME uses GJS/GTK3/AppIndicator; Windows 10+ uses native WinForms NotifyIcon. The Windows smoke and lifecycle tests run on GitHub Actions Windows Server 2022. Windows 10/11 interactive desktop acceptance is still pending. macOS uses AppKit via the built-in JXA bridge, with native smoke, lifecycle and clean Codex loader checks on macOS 15 for Apple Silicon and Intel. Interactive acceptance on a personal Mac, menu bar overflow/notch placement and older macOS versions remain unverified. See VERIFICATION.md for exact coverage.
 
 Each user must sign into their own Codex account. Current accounts may return only a weekly limit. The 5-hour path is tested with fixtures until the account supplies that window.
 

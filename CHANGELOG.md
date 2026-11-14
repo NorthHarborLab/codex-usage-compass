@@ -1,3 +1,10 @@
+# 0.5.0
+
+- Add an automatically managed macOS AppKit menu bar ring for Intel and Apple Silicon, using the built-in JXA runtime.
+- Include remaining quota, hover summary, bilingual menus, refresh, hide/restore and parent-exit cleanup without an extra app, compiler or login item.
+- Hide unavailable 5-hour quota blocks in Ubuntu, Windows and macOS system menus; restore them when data becomes available.
+- Add macOS native IPC/menu tests, fragmented Unicode input coverage, lifecycle checks and clean Codex loader CI on both architectures.
+
 # 0.4.0
 
 - Bundle the desktop ring inside the plugin and start it with the local MCP service; no separate companion install command.
