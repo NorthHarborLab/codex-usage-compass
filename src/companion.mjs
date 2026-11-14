@@ -149,6 +149,17 @@ export function startCompanion(bundleDir, options = {}) {
   retry.unref();
   return {
     status: statusCode,
+    async installDesktopSupport() {
+      if (process.platform !== 'linux') return status;
+      // Only the explicit in-panel setup button requests OS authorization.
+      // No sudo password handling and no shell interpolation.
+      try {
+        await access('/usr/bin/apt-get');
+        await new Promise((resolve, reject) => execFile('pkexec', ['/usr/bin/apt-get', 'install', '-y', 'gjs', 'gir1.2-gtk-3.0', 'gir1.2-ayatanaappindicator3-0.1', 'gnome-shell-extension-appindicator'], { timeout: 180_000 }, error => error ? reject(error) : resolve()));
+        await tick();
+      } catch { status = 'failed'; }
+      return status;
+    },
     async enable(enabled) {
       await mkdir(paths.root, { recursive: true, mode: 0o700 });
       preferences.enabled = enabled;

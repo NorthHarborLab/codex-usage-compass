@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node src/build.mjs",
-    "test": "node --test src/*.test.mjs"
+    "test": "node --test src/usage.test.mjs src/companion.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "1.7.5",

@@ -26,13 +26,13 @@ async function usageResult() {
     }).join('\n');
     return {
       content: [{ type: 'text', text: summary }],
-      structuredContent: { ...snapshot, companion: companion.status() },
+      structuredContent: { ...snapshot, companion: companion.status(), platform: process.platform },
     };
   } catch (error) {
     const message = error.message;
     return {
       content: [{ type: 'text', text: message }],
-      structuredContent: { error: message, companion: companion.status() },
+      structuredContent: { error: message, companion: companion.status(), platform: process.platform },
     };
   }
 }
@@ -64,6 +64,13 @@ registerAppTool(server, 'set_system_ring', {
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   _meta: { ui: { visibility: ['app'] } },
 }, async ({ enabled }) => ({ content: [], structuredContent: { companion: await companion.enable(enabled) } }));
+
+registerAppTool(server, 'install_desktop_support', {
+  title: 'Install desktop support / 安装桌面支持',
+  description: 'Install Ubuntu tray dependencies using the system authorization dialog.',
+  inputSchema: {}, annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+  _meta: { ui: { visibility: ['app'] } },
+}, async () => ({ content: [], structuredContent: { companion: await companion.installDesktopSupport() } }));
 
 registerAppResource(server, t(systemLocale(), 'title'), resourceUri, { mimeType: RESOURCE_MIME_TYPE }, async () => ({
   contents: [{

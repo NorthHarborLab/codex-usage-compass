@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, readdir } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, cp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -6,10 +6,12 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import assert from 'node:assert/strict';
 const temp = await mkdtemp(join(tmpdir(), 'quota Windows 中文 '));
 const env = { ...process.env, LOCALAPPDATA: temp, CODEX_HOME: join(temp, 'codex'), CODEX_MCP_NODE_PATH: process.execPath };
+const installed = join(temp, '安装包 with spaces');
+await cp(resolve('plugins/weekly-usage'), installed, { recursive: true });
 const clients = [];
 async function connect() {
   const client = new Client({ name: 'windows-test', version: '1' });
-  const transport = new StdioClientTransport({ command: 'cmd.exe', args: ['/d', '/c', resolve('plugins/weekly-usage/launch.cmd')], env });
+  const transport = new StdioClientTransport({ command: join(installed, 'launch.cmd'), args: [], env });
   await client.connect(transport);
   clients.push(client);
   return client;

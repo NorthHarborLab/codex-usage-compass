@@ -25,6 +25,7 @@ let dateTime = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle
 
 let snapshot;
 let companionStatus = 'starting';
+let platform;
 const trayToggle = document.getElementById('tray-toggle');
 let connected = false;
 let busy = false;
@@ -86,6 +87,10 @@ function render() {
 
   const trayKeys = { running: 'trayRunning', shared: 'trayRunning', starting: 'trayStarting', disabled: 'trayDisabled', failed: 'trayFailed', headless: 'trayHeadless', unsupported: 'trayUnsupported' };
   document.getElementById('tray-status').textContent = t(locale, trayKeys[companionStatus] || 'trayStarting');
+  const setup = document.getElementById('tray-setup');
+  setup.hidden = platform !== 'linux' || companionStatus !== 'failed';
+  setup.disabled = !connected || busy;
+  setup.textContent = t(locale, 'traySetup');
   trayToggle.textContent = t(locale, companionStatus === 'disabled' ? 'trayEnable' : 'trayDisable');
   trayToggle.disabled = !connected || busy;
   const { updated, refresh, notice } = elements;
@@ -101,6 +106,7 @@ function render() {
 
 function accept(result) {
   const data = result.structuredContent;
+  if (data?.platform) platform = data.platform;
   if (data?.companion) companionStatus = data.companion;
   if (data?.error || result.isError) {
     error = data?.error ?? '暂时无法读取额度，请重试。';
@@ -166,6 +172,14 @@ app.onteardown = async () => {
 function onVisibility() {
   if (!document.hidden && document.hasFocus()) void refreshUsage();
 }
+
+document.getElementById('tray-setup').addEventListener('click', async () => {
+  busy = true; render();
+  try {
+    const result = await app.callServerTool({ name: 'install_desktop_support', arguments: {} }, { timeout: 190_000 });
+    if (result.structuredContent?.companion) companionStatus = result.structuredContent.companion;
+  } catch { companionStatus = 'failed'; } finally { busy = false; render(); }
+});
 
 trayToggle.addEventListener('click', async () => {
   busy = true; render();

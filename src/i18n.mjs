@@ -3,7 +3,7 @@ export function resolveLocale(value = 'en') {
   return /^zh(?:[-_]|$)/i.test(value) ? 'zh-CN' : 'en';
 }
 const en = {
-  trayHide: 'Hide system ring', trayEnable: 'Show system ring', trayDisable: 'Hide system ring', trayRunning: 'System ring is running', trayStarting: 'Starting system ring…', trayDisabled: 'System ring is hidden', trayFailed: 'System ring could not start. Check desktop dependencies.', trayHeadless: 'System ring needs a local desktop session.', trayUnsupported: 'System ring is not available on this platform.', title: 'Codex Usage Compass', scopeBoth: 'Guidance · both quota windows', scopeWeekly: 'Guidance · based on 7-day quota only', scopeShort: 'Guidance · based on 5-hour quota only', scopeNone: 'Guidance · waiting for quota data', weekly: '7 days', fiveHour: '5 hours',
+  traySetup: 'Install desktop support…', trayHide: 'Hide system ring', trayEnable: 'Show system ring', trayDisable: 'Hide system ring', trayRunning: 'System ring is running', trayStarting: 'Starting system ring…', trayDisabled: 'System ring is hidden', trayFailed: 'System ring could not start. Check desktop dependencies.', trayHeadless: 'System ring needs a local desktop session.', trayUnsupported: 'System ring is not available on this platform.', title: 'Codex Usage Compass', scopeBoth: 'Guidance · both quota windows', scopeWeekly: 'Guidance · based on 7-day quota only', scopeShort: 'Guidance · based on 5-hour quota only', scopeNone: 'Guidance · waiting for quota data', weekly: '7 days', fiveHour: '5 hours',
   remaining: 'Remaining', countdown: 'Resets in', target: 'Time-based reserve',
   coverage: 'Budget coverage', loading: 'Loading', unavailable: 'No data available',
   failed: 'Unable to read usage', refresh: 'Refresh', refreshing: 'Refreshing…',
@@ -30,7 +30,7 @@ const en = {
   day: 'd', hour: 'h', minute: 'm', second: 's',
 };
 const zh = {
-  trayHide: '隐藏系统圆环', trayEnable: '显示系统圆环', trayDisable: '隐藏系统圆环', trayRunning: '系统圆环已运行', trayStarting: '正在启动系统圆环…', trayDisabled: '系统圆环已隐藏', trayFailed: '系统圆环启动失败，请检查桌面依赖。', trayHeadless: '系统圆环需要本机桌面会话。', trayUnsupported: '此平台暂不支持系统圆环。', title: 'Codex 额度指南', scopeBoth: '使用建议 · 综合两个额度周期', scopeWeekly: '使用建议 · 依据 7 天额度', scopeShort: '使用建议 · 依据 5 小时额度', scopeNone: '使用建议 · 等待额度数据', weekly: '7 天', fiveHour: '5 小时',
+  traySetup: '安装桌面支持…', trayHide: '隐藏系统圆环', trayEnable: '显示系统圆环', trayDisable: '隐藏系统圆环', trayRunning: '系统圆环已运行', trayStarting: '正在启动系统圆环…', trayDisabled: '系统圆环已隐藏', trayFailed: '系统圆环启动失败，请检查桌面依赖。', trayHeadless: '系统圆环需要本机桌面会话。', trayUnsupported: '此平台暂不支持系统圆环。', title: 'Codex 额度指南', scopeBoth: '使用建议 · 综合两个额度周期', scopeWeekly: '使用建议 · 依据 7 天额度', scopeShort: '使用建议 · 依据 5 小时额度', scopeNone: '使用建议 · 等待额度数据', weekly: '7 天', fiveHour: '5 小时',
   remaining: '实际剩余', countdown: '距重置', target: '按时间应留', coverage: '预算覆盖率',
   loading: '正在读取', unavailable: '暂无数据', failed: '读取失败', refresh: '刷新用量', refreshing: '正在刷新…',
   stale: '同步失败 · 显示上次用量', updated: '上次同步', auto: '每分钟同步用量',
