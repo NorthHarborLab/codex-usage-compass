@@ -47,6 +47,11 @@ try {
   assert.equal(first.title,'38%');
   assert.equal(first.imageWidth,18);
   assert.equal(first.english,1);
+  assert.equal(first.shortHidden,false);
+  send(trayModel({...snapshot,windows:{weekly:snapshot.windows.weekly}},'en',false,now));
+  const weeklyOnly = await inspect();
+  assert.equal(weeklyOnly.shortHidden,true);
+  assert.equal(weeklyOnly.shortSeparatorHidden,true);
   send(trayModel(snapshot,'en',false,now+1000));
   assert.notEqual((await inspect()).rows[9],first.rows[9]);
   // Split inside a multibyte character to verify the native byte buffer.
@@ -59,6 +64,7 @@ try {
   const chinese = await inspect();
   assert.deepEqual(chinese.rows,zh.rows);
   assert.equal(chinese.chinese,1);
+  assert.equal(chinese.shortHidden,false);
   for (const colour of ['#FC637A','#FF9654','#FFCC4A','#66A8FF','#94D454','#4CD9E6']) {
     for (const fill of [0,25,100]) send({...en,colour,fill});
   }

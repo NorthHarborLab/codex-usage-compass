@@ -47,6 +47,7 @@ function render(frame) {
   frame.rows.forEach(function (text, i) {
     if (rowItems[i] && typeof text === 'string') rowItems[i].title = $(text);
   });
+  for (var i = 8; i <= 12; i++) menu.itemAtIndex(i).hidden = !frame.showFiveHour;
   refreshItem.title = $(frame.refresh);
   hideItem.title = $(frame.hide);
   englishItem.state = frame.locale === 'en' ? 1 : 0;
@@ -67,7 +68,8 @@ function receive(message) {
     emit({ action: 'inspection', frames: frames, title: ObjC.unwrap(statusItem.button.title),
       tooltip: ObjC.unwrap(statusItem.button.toolTip), imageWidth: statusItem.button.image.size.width,
       rows: rowItems.map(function (row) { return row ? ObjC.unwrap(row.title) : null; }),
-      english: englishItem.state, chinese: chineseItem.state });
+      english: englishItem.state, chinese: chineseItem.state,
+      shortHidden: menu.itemAtIndex(8).hidden, shortSeparatorHidden: menu.itemAtIndex(12).hidden });
   } else if (testMode && message.test === 'click') {
     var actions = { refresh: refreshItem, hide: hideItem, en: englishItem, 'zh-CN': chineseItem };
     var target = actions[message.item];
@@ -96,12 +98,11 @@ ObjC.registerSubclass({
           var consumed = range.location + range.length;
           pending = $.NSMutableData.dataWithData(pending.subdataWithRange($.NSMakeRange(consumed, pending.length - consumed)));
           try { receive(JSON.parse(ObjC.unwrap(line))); }
-          catch (error) { emit({ action: 'render-error' }); if (testMode) emit({ action: 'test-error', message: String(error) }); }
+          catch (error) { emit({ action: 'render-error', message: testMode ? String(error) + ' ' + error.stack : undefined }); }
         }
         input.readInBackgroundAndNotifyForModes($([$.NSRunLoopCommonModes]));
       } catch (error) {
-        emit({ action: 'render-error' });
-        if (testMode) emit({ action: 'test-error', message: String(error) });
+        emit({ action: 'render-error', message: testMode ? String(error) + ' ' + error.stack : undefined });
         finish(1);
       }
     } }

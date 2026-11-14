@@ -107,9 +107,10 @@ const scopeItem = addItem('');
 const adviceItem = addItem('');
 menu.append(new Gtk.SeparatorMenuItem());
 const sections = QUOTA_PERIODS.map(({ id, label }, index) => {
-  if (index > 0) menu.append(new Gtk.SeparatorMenuItem());
+  const separator = index > 0 ? new Gtk.SeparatorMenuItem() : null;
+  if (separator) menu.append(separator);
   return {
-    id, label,
+    id, label, separator,
     summary: addItem(`${label}额度 · 正在读取`),
     countdown: addItem('距重置 · —'),
     target: addItem('按时间应留 · —'),
@@ -151,6 +152,10 @@ function render() {
   const active = [];
   for (const section of sections) {
     const window = snapshot?.windows[section.id];
+    const visible = section.id !== 'fiveHour' || Boolean(window);
+    for (const item of [section.separator, section.summary, section.countdown, section.target, section.coverage]) {
+      if (item) { item.set_no_show_all(true); item.set_visible(visible); }
+    }
     const status = window && usageStatus(window, now);
     const live = status?.timeLeftMs > 0;
     if (live) active.push({ label: t(locale, section.id), ...status });

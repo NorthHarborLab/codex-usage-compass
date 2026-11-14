@@ -47,14 +47,22 @@ test('native tray frame uses tightest quota, both languages, stale neutral and c
   assert.match(zh.rows[0], /使用建议/);
   assert.equal(en.colour, '#FC637A');
   assert.equal(en.shortText, '10%');
+  assert.equal(en.showFiveHour, true);
   assert.equal(trayModel(snapshot,'en',false,now+121000).shortText, '—');
   assert.notEqual(en.rows[9], trayModel(snapshot,'en',false,now+1000).rows[9]);
   assert.equal(trayModel(snapshot,'en',false,now+121000).fill,0);
+});
+test('system menus hide absent 5-hour data but retain known empty or expired quotas', () => {
+  const now = Date.now();
+  assert.equal(trayModel(undefined,'en').showFiveHour, false);
+  assert.equal(trayModel({fetchedAtMs:now,windows:{fiveHour:null}},'en').showFiveHour, false);
+  const short = {usedPercent:100,windowMinutes:300,resetsAtMs:now-1000};
+  assert.equal(trayModel({fetchedAtMs:now,windows:{fiveHour:short}},'en').showFiveHour, true);
 });
 test('macOS launch accepts Unicode/spaces without a shell and uses Application Support', () => {
   const source = '/Users/测试/Plugin directory/macos-tray.js';
   assert.deepEqual(macLaunch(source, {}).args, ['-l', 'JavaScript', source]);
   assert.equal(macLaunch(source, {}).command, '/usr/bin/osascript');
   assert.equal(companionPaths({HOME:'/Users/demo', CODEX_HOME:'/tmp/test'}, 'darwin').preferences,
-    '/Users/demo/Library/Application Support/codex-usage-compass/preferences.json');
+    join('/Users/demo', 'Library', 'Application Support', 'codex-usage-compass', 'preferences.json'));
 });

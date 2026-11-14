@@ -81,6 +81,7 @@ public static class UsageCompassTray {
         var rows = (object[])data["rows"];
         if (rows.Length != 13) throw new ArgumentException("Invalid tray rows");
         for (int i = 0; i < rows.Length; i++) if (rows[i] != null) menu.Items[i].Text = Convert.ToString(rows[i]);
+        for (int i = 8; i <= 12; i++) menu.Items[i].Available = Convert.ToBoolean(data["showFiveHour"]);
         refresh.Text = Text(data, "refresh");
         hide.Text = Text(data, "hide");
         string tooltip = Text(data, "tooltip");
@@ -128,6 +129,13 @@ public static class UsageCompassTray {
             Render(frame);
             if (tray.Icon == null || !tray.Visible || menu.Items.Count != 16) throw new Exception("Tray not initialized");
             if (!menu.Items[0].Text.StartsWith("使用建议")) throw new Exception("Unicode failed");
+            var data = (IDictionary)json.DeserializeObject(frame);
+            data["showFiveHour"] = false;
+            Render(json.Serialize(data));
+            for (int i = 8; i <= 12; i++) if (menu.Items[i].Available) throw new Exception("Missing short window should be hidden");
+            data["showFiveHour"] = true;
+            Render(json.Serialize(data));
+            for (int i = 8; i <= 12; i++) if (!menu.Items[i].Available) throw new Exception("Short window should reappear");
             refresh.PerformClick();
             var languages = (ToolStripMenuItem)menu.Items[14];
             ((ToolStripMenuItem)languages.DropDownItems[1]).PerformClick();
