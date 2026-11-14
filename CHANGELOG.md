@@ -1,3 +1,12 @@
+# 0.4.0
+
+- Bundle the desktop ring inside the plugin and start it with the local MCP service; no separate companion install command.
+- Add Windows 10+ native tray rendering, click menus, hover summary, bilingual guidance and dynamic ring updates.
+- Share a single ring across chats; recover ownership, preserve hide/language preferences and clean up on service exit.
+- Add in-panel show/hide controls and a graphical Ubuntu dependency setup action.
+- Add Linux isolation and native Windows CI checks, including the actual Codex plugin loader.
+- Repair the inherited dependency lock file for reproducible fresh builds.
+
 # Changelog
 
 ## 0.3.2

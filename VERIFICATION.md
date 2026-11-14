@@ -1,16 +1,26 @@
-# Release verification — v0.3.2
+# Verification for 0.4.0
 
-Tested on Ubuntu with GNOME Shell 50.1, Node.js 26.11.1, GJS/GTK3 and the desktop's Codex CLI.
+Local environment: Ubuntu GNOME 50.1, GJS/GTK3/AppIndicator, the desktop's Codex CLI, Node.js 26.11.1. CI uses Node.js 20 on Ubuntu and Windows Server 2022.
 
-- Six automated tests passed for duration-based window discovery, budget calculations, interval boundaries, low-quota overrides, stale/expired data, and language fallback.
-- Chromium MCP-host simulation passed for bilingual rendering, two independently coloured rings, conservative combined advice, moving countdowns, missing windows and narrow layouts.
-- Clean installation used a new temporary HOME and CODEX_HOME with no prior plugin cache, credentials or node_modules. The packaged MCP launched, advertised its tools, returned the UI, and gave a readable signed-out error.
-- The companion installed into that fresh home and ran on a separate session D-Bus with a test StatusNotifierWatcher. A simulated Codex process supplied both windows. Exported menu data, second-by-second countdown changes and the English-to-Chinese menu action passed.
-- The real user session was upgraded through the same installer. Its systemd service and registered top-panel indicator were checked, and the real Codex account returned weekly quota.
+- Ten unit tests cover quota discovery and thresholds, pacing advice, languages, concurrent single-owner locking, stale-owner recovery, Windows launch arguments and native tray view models.
+- Chromium UI tests cover dual quotas, conservative advice, EN/ZH switching, second-by-second countdown, unavailable windows and narrow layouts.
+- A clean HOME/CODEX_HOME installs only the plugin, discovers its server using `codex mcp list`, starts its packaged MCP server, discovers tools and resources, and displays a signed-out account error. No separate indicator install is performed.
+- A separate D-Bus session starts the installed plugin launcher with a simulated Codex account. Its automatic GJS child exports the expected menu, countdown and language actions. Two loaded plugins share one owner; closing the owner transfers ownership to the second; hiding the ring persists and removes the lock.
+- Codex's own app-server discovers and starts the plugin from a fresh profile with spaces and Chinese characters in its path. This caught and fixed a launcher-path compatibility issue that direct server tests could not reveal.
+- Windows CI compiles the shipped C# renderer using Windows PowerShell 5.1 and .NET Framework, creates a NotifyIcon and menu, checks Unicode guidance, invokes refresh/language actions, and repeatedly replaces/disposes ring icons.
+- Windows lifecycle CI runs the packaged `.cmd` launcher from a directory containing spaces and Chinese characters, uses two MCP clients, hides/restarts the ring, and checks final lock cleanup.
+- CI performs `npm ci` in a fresh environment. A broken inherited transitive dependency URL was repaired by regenerating the lock file from the pinned direct dependencies. Production dependency license notices were regenerated.
 
-This is an isolated application installation on the existing operating system, not a freshly installed VM. Native UI automation cannot inspect the full GNOME panel here; menu integration is verified through its D-Bus contract. The user previously confirmed the in-app panel renders and counts down. The live account did not supply a 5-hour window, so that path uses fixtures. The Ayatana fallback, Windows and macOS are untested.
+Windows smoke/lifecycle reference run: https://github.com/NorthHarborLab/codex-usage-compass/actions/runs/43584285185
+Native Codex loader check also passed on Windows: https://github.com/NorthHarborLab/codex-usage-compass/actions/runs/43584558875
 
-To repeat:
+## Limits
+
+The Linux clean install uses an isolated application profile on the existing OS, rather than a new OS VM. GNOME integration is checked via D-Bus, with previous user confirmation of the panel's visual rendering. Windows CI is Windows Server 2022; interactive Windows 10/11 desktop acceptance, taskbar overflow placement and actual account usage on Windows remain unverified. Current live account data provides only the weekly window; five-hour tests use fixtures. The Ubuntu graphical authorization flow for dependency installation was not invoked on this already-provisioned machine. Newly installed GNOME extensions can need enabling/relogin. macOS tray support is not implemented.
+
+Automatic startup happens when Codex loads the local MCP service. There is no install-completed hook, and a host that defers local service startup can require opening the quota panel once. Disabling/uninstalling takes effect when the host unloads existing MCP connections. No registry startup key or new systemd service is installed by the automatic mode.
+
+## Reproduce
 
 ```sh
 npm ci
@@ -18,8 +28,9 @@ npm test
 npm run build
 node scripts/verify-ui.mjs
 node scripts/verify-clean.mjs
-# Use the temporary home path printed by the previous command:
-env HOME=/tmp/quota-clean-XXXXXX/home dbus-run-session -- python3 scripts/verify-indicator.py
+node scripts/verify-host.mjs
+# Use the fresh home and plugin cache printed by verify-clean:
+env HOME=/tmp/quota-clean-XXXX/home dbus-run-session -- python3 scripts/verify-auto-indicator.py /tmp/quota-clean-XXXX/home/.codex/plugins/cache/weekly-usage-local/weekly-usage/0.4.0
 ```
 
-The clean installer test sets USAGE_INSTALL_ONLY=1 to stage the companion without changing the active user's service manager. It then launches that staged companion directly in its isolated session.
+Windows CI uses `scripts/verify-windows.ps1`, `scripts/verify-windows-lifecycle.mjs`, and `scripts/verify-host.mjs` with the npm Codex launcher.
