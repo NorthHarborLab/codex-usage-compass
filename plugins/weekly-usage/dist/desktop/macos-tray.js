@@ -68,7 +68,7 @@ function receive(message) {
     emit({ action: 'inspection', frames: frames, title: ObjC.unwrap(statusItem.button.title),
       tooltip: ObjC.unwrap(statusItem.button.toolTip), imageWidth: statusItem.button.image.size.width,
       rows: rowItems.map(function (row) { return row ? ObjC.unwrap(row.title) : null; }),
-      english: englishItem.state, chinese: chineseItem.state,
+      english: Number(englishItem.state), chinese: Number(chineseItem.state),
       shortHidden: menu.itemAtIndex(8).hidden, shortSeparatorHidden: menu.itemAtIndex(12).hidden });
   } else if (testMode && message.test === 'click') {
     var actions = { refresh: refreshItem, hide: hideItem, en: englishItem, 'zh-CN': chineseItem };
