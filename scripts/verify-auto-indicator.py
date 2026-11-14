@@ -10,18 +10,20 @@ import sys
 root = Path(tempfile.mkdtemp(prefix="quota-indicator-test-"))
 fixture = root / "codex"
 fixture.write_text("""#!/usr/bin/python3
-import json,sys,time
+import json,sys,time,os
 for line in sys.stdin:
  message=json.loads(line)
  if message.get('id')==1: print(json.dumps({'id':1,'result':{}}),flush=True)
  if message.get('id')==2:
-  print(json.dumps({'id':2,'result':{'rateLimits':{
-   'primary':{'usedPercent':20,'windowDurationMins':10080,'resetsAt':int(time.time())+5040*60},
-   'secondary':{'usedPercent':90,'windowDurationMins':300,'resetsAt':int(time.time())+150*60}
-  }}}),flush=True)
+  limits={'primary':{'usedPercent':20,'windowDurationMins':10080,'resetsAt':int(time.time())+5040*60}}
+  if os.path.exists(os.environ['USAGE_FIXTURE_SHORT_FILE']):
+   limits['secondary']={'usedPercent':90,'windowDurationMins':300,'resetsAt':int(time.time())+150*60}
+  print(json.dumps({'id':2,'result':{'rateLimits':limits}}),flush=True)
 """)
 fixture.chmod(0o755)
-env = dict(os.environ, XDG_CONFIG_HOME=str(root/"config"), CODEX_CLI_PATH=str(fixture), USAGE_LANGUAGE="en", XDG_RUNTIME_DIR=str(root), GDK_BACKEND="x11")
+short_flag=root/"short-window"
+short_flag.touch()
+env = dict(os.environ, XDG_CONFIG_HOME=str(root/"config"), CODEX_CLI_PATH=str(fixture), USAGE_LANGUAGE="en", XDG_RUNTIME_DIR=str(root), GDK_BACKEND="x11", USAGE_FIXTURE_SHORT_FILE=str(short_flag))
 entry = Path(sys.argv[1]).resolve()/"launch"
 watcher_code = """
 from gi.repository import Gio, GLib
@@ -59,6 +61,7 @@ try:
         _, layout=bus("call",address,menu,"com.canonical.dbusmenu","GetLayout","iias","0","-1","0")
         def walk(node):
             ident, props, children=node
+            if props.get("visible",{}).get("data") is False: return {}
             result={ident:props.get("label",{}).get("data","")}
             for child in children: result.update(walk(child["data"]))
             return result
@@ -72,6 +75,23 @@ try:
     before=[v for v in values.values() if v.startswith("Resets in")]
     time.sleep(2)
     assert before != [v for v in rows().values() if v.startswith("Resets in")]
+    # Missing short-window data removes the whole block; a later sync restores it.
+    refresh=next(k for k,v in rows().items() if v=="Refresh")
+    def click(ident):
+        subprocess.check_call(["busctl","--user","--","call",address,menu,"com.canonical.dbusmenu","Event","isvu",str(ident),"clicked","s","","0"])
+    short_flag.unlink()
+    click(refresh)
+    for attempt in range(50):
+        if not any(v.startswith("5 hours") for v in rows().values()): break
+        time.sleep(.1)
+    assert not any(v.startswith("5 hours") for v in rows().values())
+    assert len([v for v in rows().values() if v.startswith("Resets in")]) == 1
+    short_flag.touch()
+    click(refresh)
+    for attempt in range(50):
+        if any(v.startswith("5 hours") for v in rows().values()): break
+        time.sleep(.1)
+    assert any(v.startswith("5 hours") for v in rows().values())
     language=next(k for k,v in rows().items() if v=="简体中文")
     subprocess.check_call(["busctl","--user","--","call",address,menu,"com.canonical.dbusmenu","Event","isvu",str(language),"clicked","s","","0"])
     assert any("重要任务" in v for v in rows().values())

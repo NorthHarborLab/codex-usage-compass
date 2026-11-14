@@ -88,14 +88,16 @@ ObjC.registerSubclass({
     'readInput:': { types: ['void', ['id']], implementation: function (notification) {
       try {
         var data = notification.userInfo.objectForKey($.NSFileHandleNotificationDataItem);
-        if (data.length === 0) finish(0); // Parent exited or closed its pipe.
+        if (Number(data.length) === 0) finish(0); // Parent exited or closed its pipe.
         pending.appendData(data);
         if (pending.length > 1048576) throw Error('Oversized frame');
         while (pending.length) {
           var range = pending.rangeOfDataOptionsRange(separator, 0, $.NSMakeRange(0, pending.length));
-          if (range.location >= pending.length) break;
-          var line = $.NSString.alloc.initWithDataEncoding(pending.subdataWithRange($.NSMakeRange(0, range.location)), $.NSUTF8StringEncoding);
-          var consumed = range.location + range.length;
+          // JXA exposes NSUInteger struct fields as strings on some runtimes.
+          var location = Number(range.location), length = Number(range.length);
+          if (location >= pending.length) break;
+          var line = $.NSString.alloc.initWithDataEncoding(pending.subdataWithRange($.NSMakeRange(0, location)), $.NSUTF8StringEncoding);
+          var consumed = location + length;
           pending = $.NSMutableData.dataWithData(pending.subdataWithRange($.NSMakeRange(consumed, pending.length - consumed)));
           try { receive(JSON.parse(ObjC.unwrap(line))); }
           catch (error) { emit({ action: 'render-error', message: testMode ? String(error) + ' ' + error.stack : undefined }); }
