@@ -9,7 +9,9 @@ import { systemLocale, resolveLocale } from './i18n.mjs';
 import { trayModel } from './tray-model.mjs';
 
 export function companionPaths(env = process.env, platform = process.platform) {
-  const base = platform === 'win32' ? env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local') : env.XDG_CONFIG_HOME || join(homedir(), '.config');
+  const base = platform === 'win32' ? env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local')
+    : platform === 'darwin' ? join(env.HOME || homedir(), 'Library', 'Application Support')
+    : env.XDG_CONFIG_HOME || join(homedir(), '.config');
   const root = join(base, 'codex-usage-compass');
   const scope = createHash('sha256').update((env.CODEX_HOME || join(homedir(), '.codex')) + (env.DISPLAY || env.WAYLAND_DISPLAY || '')).digest('hex').slice(0, 16);
   return { root, lock: join(root, `tray-${scope}.lock`), preferences: join(root, 'preferences.json') };
@@ -56,6 +58,11 @@ export function windowsLaunch(source, env = process.env) {
   };
 }
 
+export function macLaunch(source, env = process.env) {
+  // AppKit through Apple's built-in JXA bridge; no compiler or downloaded binary.
+  return { command: '/usr/bin/osascript', args: ['-l', 'JavaScript', source], env: { ...env } };
+}
+
 export function startCompanion(bundleDir, options = {}) {
   const paths = options.paths || companionPaths();
   let status = 'starting', stopped = false, running = false, release, child, retry, timer, polling = false, snapshot, failed = false;
@@ -97,7 +104,7 @@ export function startCompanion(bundleDir, options = {}) {
         status = 'disabled'; await stopChild(); return;
       }
       if (child) return;
-      if (!['linux', 'win32'].includes(process.platform)) { status = 'unsupported'; return; }
+      if (!['linux', 'win32', 'darwin'].includes(process.platform)) { status = 'unsupported'; return; }
       if (process.platform === 'linux' && !process.env.DISPLAY && !process.env.WAYLAND_DISPLAY) { status = 'headless'; return; }
       release = await acquireLock(paths.lock);
       if (!release) { status = 'shared'; return; }
@@ -106,7 +113,8 @@ export function startCompanion(bundleDir, options = {}) {
       if (process.platform === 'linux') {
         if (!options.skipMigration) await migrateLegacyService();
         launch = { command: 'gjs', args: ['-m', join(bundleDir, 'desktop/indicator.mjs')], env: { ...process.env, CODEX_MCP_NODE_PATH: process.execPath, USAGE_LANGUAGE: locale, USAGE_MANAGED_TRAY: '1', USAGE_TRAY_PREFERENCES: paths.preferences } };
-      } else launch = windowsLaunch(join(bundleDir, 'desktop/UsageCompassTray.cs'));
+      } else if (process.platform === 'darwin') launch = macLaunch(join(bundleDir, 'desktop/macos-tray.js'));
+      else launch = windowsLaunch(join(bundleDir, 'desktop/UsageCompassTray.cs'));
       child = spawn(launch.command, launch.args, { env: launch.env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
       const current = child;
       status = 'starting';
@@ -131,7 +139,7 @@ export function startCompanion(bundleDir, options = {}) {
         status = 'failed';
         if (release) { const unlock = release; release = undefined; void unlock(); }
       });
-      if (process.platform === 'win32') {
+      if (process.platform === 'win32' || process.platform === 'darwin') {
         let lastPoll = 0;
         const resetChecks = new Set();
         timer = setInterval(() => {

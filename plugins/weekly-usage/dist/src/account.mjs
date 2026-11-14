@@ -11,6 +11,11 @@ export function codexCommand() {
     process.env.CODEX_CLI_PATH,
     process.env.CODEX_ELECTRON_RESOURCES_PATH && join(process.env.CODEX_ELECTRON_RESOURCES_PATH, process.platform === 'win32' ? 'codex.exe' : 'codex'),
     join(homedir(), '.local/bin/codex'),
+    ...(process.platform === 'darwin' ? [
+      '/Applications/Codex.app/Contents/Resources/codex',
+      join(homedir(), 'Applications/Codex.app/Contents/Resources/codex'),
+      '/opt/homebrew/bin/codex', '/usr/local/bin/codex',
+    ] : []),
     '/usr/lib/chatgpt/resources/codex',
   ];
   return candidates.find((path) => path && existsSync(path)) ?? 'codex';
@@ -60,7 +65,7 @@ function readLimits() {
     send({
       id: 1,
       method: 'initialize',
-      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.4.0' } },
+      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.5.0' } },
     });
   });
 }

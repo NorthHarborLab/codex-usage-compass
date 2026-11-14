@@ -38,5 +38,5 @@ await Promise.all([
 // Keep the installed plugin self-contained, including its desktop renderer.
 await mkdir(new URL('desktop/', dist), { recursive: true });
 await mkdir(new URL('src/', dist), { recursive: true });
-for (const file of ['indicator.mjs', 'read-usage.mjs', 'UsageCompassTray.cs']) await cp(new URL('../desktop/' + file, import.meta.url), new URL('desktop/' + file, dist));
+for (const file of ['indicator.mjs', 'read-usage.mjs', 'UsageCompassTray.cs', 'macos-tray.js']) await cp(new URL('../desktop/' + file, import.meta.url), new URL('desktop/' + file, dist));
 for (const file of ['account.mjs', 'usage.mjs', 'i18n.mjs']) await cp(new URL(file, import.meta.url), new URL('src/' + file, dist));

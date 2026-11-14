@@ -9,7 +9,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { getUsage } from './account.mjs';
 import { QUOTA_PERIODS, usageStatus } from './usage.mjs';
 
-const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.4.0' });
+const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.5.0' });
 const companion = startCompanion(__dirname);
 const resourceUri = 'ui://weekly-usage/dashboard.html';
 const viewPath = join(__dirname, 'dashboard.html');

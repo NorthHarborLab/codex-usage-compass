@@ -34,7 +34,7 @@ try {
           assert.ok(server,JSON.stringify(data));
           assert.equal(server.toolsError,null);
           assert.ok(server.tools.set_system_ring);
-          assert.equal(server.serverInfo.version,'0.4.0');
+          assert.equal(server.serverInfo.version,'0.5.0');
           resolve();
         }catch(error){reject(error);}
       }

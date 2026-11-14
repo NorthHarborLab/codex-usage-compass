@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { acquireLock, windowsLaunch } from './companion.mjs';
+import { acquireLock, windowsLaunch, macLaunch, companionPaths } from './companion.mjs';
 import { trayModel } from './tray-model.mjs';
 
 test('concurrent plugin instances elect one owner and can acquire again after shutdown', async () => {
@@ -46,6 +46,15 @@ test('native tray frame uses tightest quota, both languages, stale neutral and c
   assert.match(en.rows[1], /important work/);
   assert.match(zh.rows[0], /使用建议/);
   assert.equal(en.colour, '#FC637A');
+  assert.equal(en.shortText, '10%');
+  assert.equal(trayModel(snapshot,'en',false,now+121000).shortText, '—');
   assert.notEqual(en.rows[9], trayModel(snapshot,'en',false,now+1000).rows[9]);
   assert.equal(trayModel(snapshot,'en',false,now+121000).fill,0);
+});
+test('macOS launch accepts Unicode/spaces without a shell and uses Application Support', () => {
+  const source = '/Users/测试/Plugin directory/macos-tray.js';
+  assert.deepEqual(macLaunch(source, {}).args, ['-l', 'JavaScript', source]);
+  assert.equal(macLaunch(source, {}).command, '/usr/bin/osascript');
+  assert.equal(companionPaths({HOME:'/Users/demo', CODEX_HOME:'/tmp/test'}, 'darwin').preferences,
+    '/Users/demo/Library/Application Support/codex-usage-compass/preferences.json');
 });

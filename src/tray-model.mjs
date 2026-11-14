@@ -20,6 +20,7 @@ export function trayModel(snapshot, locale, error = false, now = Date.now()) {
   const stale = error || (snapshot && now - snapshot.fetchedAtMs > 120_000);
   const tone = stale ? 'neutral' : tightest?.tone ?? 'neutral';
   return {
+    shortText: stale || !tightest ? '—' : percent(tightest.remaining),
     title: t(locale, 'title'), rows, colour: trayColours[tone], fill: stale ? 0 : tightest?.fill ?? 0,
     tooltip: `${t(locale, 'title')} · ${stale ? t(locale, 'stale') : tightest ? `${t(locale, tightest.id)} ${percent(tightest.remaining)}` : t(locale, 'unavailable')}`,
     refresh: t(locale, 'refresh'), hide: t(locale, 'trayHide'), locale,

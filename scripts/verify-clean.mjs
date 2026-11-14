@@ -14,7 +14,7 @@ const env = { ...process.env, HOME:home, CODEX_HOME:join(home,'.codex'), USAGE_T
 execFileSync('sh',[join(source,'scripts/install-linux.sh'),'plugin'],{env,stdio:'pipe',timeout:60000});
 const configured = JSON.parse(execFileSync('codex', ['mcp','list','--json'], { env, encoding:'utf8' }));
 assert.ok(configured.some(s => s.name === 'weekly-usage' && s.enabled));
-const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.4.0');
+const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.5.0');
 const client=new Client({name:'clean-install-test',version:'1.0.0'});
 await client.connect(new StdioClientTransport({command:process.execPath,args:['./dist/server.cjs'],cwd:cache,env}));
 try {

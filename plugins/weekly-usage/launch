@@ -4,7 +4,9 @@ root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 for node_path in \
   "${CODEX_MCP_NODE_PATH:-}" \
   "${CODEX_ELECTRON_RESOURCES_PATH:-/usr/lib/chatgpt/resources}/cua_node/bin/node" \
-  "${HOME:-}/.local/lib/nodejs/bin/node"
+  "${HOME:-}/.local/lib/nodejs/bin/node" \
+  /opt/homebrew/bin/node \
+  /usr/local/bin/node
 do
   if [ -x "$node_path" ]; then exec "$node_path" "$root/dist/server.cjs"; fi
 done

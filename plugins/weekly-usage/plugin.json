@@ -1,14 +1,14 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "weekly-usage",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Local Codex usage rings and budget guidance.",
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "Codex Usage Compass",
         "shortDescription": "Quota rings and pacing tips",
-        "longDescription": "Local 7-day and 5-hour quota rings, bilingual pacing guidance and an automatic Ubuntu panel / Windows 10+ tray companion.",
+        "longDescription": "Local 7-day and 5-hour quota rings, bilingual pacing guidance and an automatic Ubuntu panel / Windows 10+ tray / macOS menu bar companion.",
         "category": "Productivity",
         "defaultPrompt": "Show my Codex quota rings and pacing advice"
       }
