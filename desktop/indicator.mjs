@@ -20,6 +20,8 @@ try {
   const [ok, bytes] = GLib.file_get_contents(configPath);
   if (ok) locale = resolveLocale(new TextDecoder().decode(bytes).trim());
 } catch {}
+const managed = GLib.getenv('USAGE_MANAGED_TRAY') === '1';
+const emit = (value) => { if (managed) print(JSON.stringify(value)); };
 const refreshIntervalMs = 60_000;
 const colours = {
   neutral: [0.63, 0.69, 0.75],
@@ -127,10 +129,13 @@ for (const [code, label] of Object.entries(languages)) {
     locale = code;
     GLib.mkdir_with_parents(GLib.get_user_config_dir(), 0o700);
     GLib.file_set_contents(configPath, code);
+    emit({ action: 'language', locale: code });
     render();
   });
   languageMenu.append(item);
 }
+const hideItem = managed ? addItem(t(locale, 'trayHide'), true) : null;
+hideItem?.connect('activate', () => { emit({ action: 'hide' }); Gtk.main_quit(); });
 const percent = (value) => `${value.toLocaleString(locale, { maximumFractionDigits: 1 })}%`;
 
 let snapshot;
@@ -179,6 +184,7 @@ function render() {
   notice.set_visible(Boolean(error));
   refresh.set_sensitive(!busy);
   setLabel(refresh, t(locale, busy ? 'refreshing' : 'refresh'));
+  if (hideItem) setLabel(hideItem, t(locale, 'trayHide'));
 }
 
 async function poll() {
@@ -206,6 +212,12 @@ refresh.connect('activate', () => void poll());
 menu.show_all();
 indicator.set_menu(menu);
 indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE);
+emit({ action: 'ready' });
+if (managed) {
+  // A pipe hangup also closes the tray if the owning MCP process is killed.
+  const input = GLib.IOChannel.unix_new(0);
+  GLib.io_add_watch(input, GLib.PRIORITY_DEFAULT, GLib.IOCondition.HUP | GLib.IOCondition.ERR, () => { Gtk.main_quit(); return GLib.SOURCE_REMOVE; });
+}
 GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => {
   const elapsed = GLib.get_monotonic_time() / 1_000 - lastPoll;
   const now = Date.now();

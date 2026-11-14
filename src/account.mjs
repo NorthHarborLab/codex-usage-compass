@@ -6,10 +6,10 @@ import { createInterface } from 'node:readline';
 import { t, systemLocale } from './i18n.mjs';
 import { quotaWindows } from './usage.mjs';
 
-function codexCommand() {
+export function codexCommand() {
   const candidates = [
     process.env.CODEX_CLI_PATH,
-    process.env.CODEX_ELECTRON_RESOURCES_PATH && join(process.env.CODEX_ELECTRON_RESOURCES_PATH, 'codex'),
+    process.env.CODEX_ELECTRON_RESOURCES_PATH && join(process.env.CODEX_ELECTRON_RESOURCES_PATH, process.platform === 'win32' ? 'codex.exe' : 'codex'),
     join(homedir(), '.local/bin/codex'),
     '/usr/lib/chatgpt/resources/codex',
   ];
@@ -19,7 +19,7 @@ function codexCommand() {
 function readLimits() {
   return new Promise((resolve, reject) => {
     const child = spawn(codexCommand(), ['app-server', '--listen', 'stdio://'], {
-      stdio: ['pipe', 'pipe', 'ignore'],
+      stdio: ['pipe', 'pipe', 'ignore'], windowsHide: true,
     });
     const output = createInterface({ input: child.stdout, crlfDelay: Infinity });
     const timeout = setTimeout(() => finish(new Error(t(systemLocale(), 'timeout'))), 12_000);
@@ -60,7 +60,7 @@ function readLimits() {
     send({
       id: 1,
       method: 'initialize',
-      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.3.2' } },
+      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.4.0' } },
     });
   });
 }

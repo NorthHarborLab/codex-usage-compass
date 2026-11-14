@@ -10,11 +10,11 @@ const home = join(root,'home');
 const source = join(root,'release');
 await mkdir(join(home,'.codex'), {recursive:true});
 await cp(process.cwd(), source, { recursive:true, filter:path=>!path.includes('/node_modules')&&!path.includes('/.git/')&&!path.endsWith('/.git') });
-const env = { ...process.env, HOME:home, CODEX_HOME:join(home,'.codex'), USAGE_INSTALL_ONLY:'1', USAGE_LANGUAGE:'en' };
-execFileSync('sh',[join(source,'scripts/install-linux.sh'),'all'],{env,stdio:'pipe',timeout:60000});
-const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.3.2');
+const env = { ...process.env, HOME:home, CODEX_HOME:join(home,'.codex'), USAGE_TRAY_DISABLED:'1', USAGE_LANGUAGE:'en' };
+execFileSync('sh',[join(source,'scripts/install-linux.sh'),'plugin'],{env,stdio:'pipe',timeout:60000});
+const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.4.0');
 const client=new Client({name:'clean-install-test',version:'1.0.0'});
-await client.connect(new StdioClientTransport({command:'sh',args:['./launch.sh','./dist/server.cjs'],cwd:cache,env}));
+await client.connect(new StdioClientTransport({command:process.execPath,args:['./dist/server.cjs'],cwd:cache,env}));
 try {
   const {tools}=await client.listTools();
   assert.ok(tools.some(t=>t.name==='show_weekly_usage'));

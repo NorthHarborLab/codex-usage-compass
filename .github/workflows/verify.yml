@@ -1,0 +1,27 @@
+name: Verify plugin and Windows tray
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Windows native icon and menu smoke test
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./scripts/verify-windows.ps1
+      - name: Windows plugin startup and shutdown
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: node scripts/verify-windows-lifecycle.mjs

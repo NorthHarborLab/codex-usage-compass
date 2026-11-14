@@ -24,6 +24,8 @@ let clock = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit
 let dateTime = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' });
 
 let snapshot;
+let companionStatus = 'starting';
+const trayToggle = document.getElementById('tray-toggle');
 let connected = false;
 let busy = false;
 let stopped = false;
@@ -82,6 +84,10 @@ function render() {
     fields.coverage.textContent = live ? percent(status.coverage) : '—';
   }
 
+  const trayKeys = { running: 'trayRunning', shared: 'trayRunning', starting: 'trayStarting', disabled: 'trayDisabled', failed: 'trayFailed', headless: 'trayHeadless', unsupported: 'trayUnsupported' };
+  document.getElementById('tray-status').textContent = t(locale, trayKeys[companionStatus] || 'trayStarting');
+  trayToggle.textContent = t(locale, companionStatus === 'disabled' ? 'trayEnable' : 'trayDisable');
+  trayToggle.disabled = !connected || busy;
   const { updated, refresh, notice } = elements;
   updated.textContent = snapshot ? `${t(locale, 'updated')} ${clock.format(snapshot.fetchedAtMs)}` : t(locale, 'auto');
   refresh.disabled = !connected || busy;
@@ -95,6 +101,7 @@ function render() {
 
 function accept(result) {
   const data = result.structuredContent;
+  if (data?.companion) companionStatus = data.companion;
   if (data?.error || result.isError) {
     error = data?.error ?? '暂时无法读取额度，请重试。';
   } else if (Number.isFinite(data?.fetchedAtMs) &&
@@ -140,7 +147,7 @@ function applyContext(context) {
 }
 
 applyDocumentTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-const app = new App({ name: 'Codex 周额度', version: '0.3.2' }, { availableDisplayModes: ['inline', 'fullscreen'] });
+const app = new App({ name: 'Codex 周额度', version: '0.4.0' }, { availableDisplayModes: ['inline', 'fullscreen'] });
 let interval;
 let initialRead;
 app.ontoolresult = (result) => {
@@ -159,6 +166,14 @@ app.onteardown = async () => {
 function onVisibility() {
   if (!document.hidden && document.hasFocus()) void refreshUsage();
 }
+
+trayToggle.addEventListener('click', async () => {
+  busy = true; render();
+  try {
+    const result = await app.callServerTool({ name: 'set_system_ring', arguments: { enabled: companionStatus === 'disabled' } });
+    if (result.structuredContent?.companion) companionStatus = result.structuredContent.companion;
+  } catch { companionStatus = 'failed'; } finally { busy = false; render(); }
+});
 
 elements.refresh.addEventListener('click', () => void refreshUsage());
 document.addEventListener('visibilitychange', onVisibility);

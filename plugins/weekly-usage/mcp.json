@@ -3,11 +3,8 @@
   "mcpServers": {
     "weekly-usage": {
       "type": "stdio",
-      "command": "sh",
-      "args": [
-        "${PLUGIN_ROOT}/launch.sh",
-        "${PLUGIN_ROOT}/dist/server.cjs"
-      ],
+      "command": "${PLUGIN_ROOT}/launch",
+      "args": [],
       "cwd": "${PLUGIN_ROOT}"
     }
   }

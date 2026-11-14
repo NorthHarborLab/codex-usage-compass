@@ -1,3 +1,5 @@
+import { startCompanion } from './companion.mjs';
+import { z } from 'zod';
 import { t, systemLocale } from './i18n.mjs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -7,7 +9,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { getUsage } from './account.mjs';
 import { QUOTA_PERIODS, usageStatus } from './usage.mjs';
 
-const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.3.2' });
+const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.4.0' });
+const companion = startCompanion(__dirname);
 const resourceUri = 'ui://weekly-usage/dashboard.html';
 const viewPath = join(__dirname, 'dashboard.html');
 
@@ -23,13 +26,13 @@ async function usageResult() {
     }).join('\n');
     return {
       content: [{ type: 'text', text: summary }],
-      structuredContent: snapshot,
+      structuredContent: { ...snapshot, companion: companion.status() },
     };
   } catch (error) {
     const message = error.message;
     return {
       content: [{ type: 'text', text: message }],
-      structuredContent: { error: message },
+      structuredContent: { error: message, companion: companion.status() },
     };
   }
 }
@@ -55,6 +58,13 @@ registerAppTool(server, 'refresh_weekly_usage', {
   _meta: { ui: { visibility: ['app'] } },
 }, usageResult);
 
+registerAppTool(server, 'set_system_ring', {
+  title: 'System ring / 系统圆环', description: 'Show or hide the bundled system tray ring.',
+  inputSchema: { enabled: z.boolean() },
+  annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  _meta: { ui: { visibility: ['app'] } },
+}, async ({ enabled }) => ({ content: [], structuredContent: { companion: await companion.enable(enabled) } }));
+
 registerAppResource(server, t(systemLocale(), 'title'), resourceUri, { mimeType: RESOURCE_MIME_TYPE }, async () => ({
   contents: [{
     uri: resourceUri,
@@ -67,6 +77,16 @@ registerAppResource(server, t(systemLocale(), 'title'), resourceUri, { mimeType:
   }],
 }));
 
+let shuttingDown = false;
+async function shutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  await companion.close();
+  process.exit(0);
+}
+process.stdin.on('end', shutdown);
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 server.connect(new StdioServerTransport()).catch((error) => {
   console.error(error);
   process.exitCode = 1;
