@@ -5,6 +5,20 @@
 [Download v0.4.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.4.0)
 显示 7 天与 5 小时额度圆环，结合剩余时间给出模型和速度建议。Ubuntu 顶栏小组件可随手展开，查看时保留当前聊天页面。
 
+## 效果预览
+
+### 额度面板 · 演示数据
+
+同时查看两个额度周期、彩色圆环和使用节奏建议。图中所有数值均为模拟演示数据；界面展示简体中文，也支持切换英文。
+
+![使用模拟演示数据的额度面板，展示 7 天与 5 小时彩色圆环](docs/images/quota-dashboard-demo.jpg)
+
+### Ubuntu 系统圆环 · 脱敏示意
+
+从系统顶栏展开额度详情，保留当前聊天页面。此图由 Ubuntu 截图经 AI 辅助编辑而成，真实用量、重置时间和背景内容均已移除。横线与脱敏标识是图片编辑处理，并非插件内置的隐私模式。Windows 使用通知区域托盘图标，外观有所不同。
+
+<img src="docs/images/system-ring-redacted.png" alt="脱敏后的 Ubuntu 系统圆环及展开菜单，个人数值均以横线替代" width="380">
+
 ## 安装一次，自动带上系统圆环
 
 在 Codex 桌面的插件管理中添加此项目作为插件市场，然后安装 **Codex Usage Compass / Codex 额度指南**：

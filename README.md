@@ -5,6 +5,20 @@
 [Download v0.4.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.4.0)
 A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and an automatic Ubuntu panel / Windows 10+ tray ring.
 
+## Preview
+
+### Quota dashboard · demo data
+
+The dashboard shows both quota windows, colour-coded rings and pacing guidance. All values in this screenshot are synthetic demo data; the interface is shown in Simplified Chinese and also supports English.
+
+![Quota dashboard with 7-day and 5-hour rings using synthetic demo data](docs/images/quota-dashboard-demo.jpg)
+
+### Ubuntu system ring · privacy-redacted illustration
+
+Check quota details from the top panel while keeping your current chat open. This illustration was edited from an Ubuntu screenshot with AI assistance: actual usage, reset times and background content have been removed. The dashes and privacy label are editorial redactions, not an in-app privacy mode. Windows uses a notification-area tray icon; its appearance differs.
+
+<img src="docs/images/system-ring-redacted.png" alt="Privacy-redacted Ubuntu system ring and expanded quota menu, with all personal values replaced by dashes" width="380">
+
 ## Install once, get the system ring
 
 Add this GitHub project as a plugin marketplace in Codex desktop, then install **Codex Usage Compass**:
