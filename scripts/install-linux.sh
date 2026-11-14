@@ -1,14 +1,14 @@
 #!/bin/sh
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-mode=${1:-all}
+mode=${1:-plugin}
 case "$mode" in all|plugin|indicator) ;; *) echo 'Usage: install-linux.sh [all|plugin|indicator]' >&2; exit 2;; esac
 if [ "$mode" != indicator ]; then
   command -v codex >/dev/null || { echo 'Install Codex CLI and sign in first.' >&2; exit 1; }
   codex plugin marketplace add "$root"
   codex plugin add weekly-usage@weekly-usage-local
 fi
-if [ "$mode" != plugin ]; then
+if [ "$mode" = indicator ]; then
   command -v gjs >/dev/null || { echo 'Install gjs, GTK3 and an AppIndicator typelib first.' >&2; exit 1; }
   destination="$HOME/.local/share/codex-weekly-usage"
   install -d "$destination/src" "$destination/desktop" "$HOME/.config/systemd/user"

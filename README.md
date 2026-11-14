@@ -2,44 +2,39 @@
 
 [简体中文](README.zh-CN.md)
 
-[Download v0.3.2](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.3.2)
-A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and an optional Ubuntu top-panel indicator.
+[Download v0.4.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.4.0)
+A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and an automatic Ubuntu panel / Windows 10+ tray ring.
 
-## Install on Ubuntu / GNOME
+## Install once, get the system ring
 
-Requirements: signed-in Codex CLI (the desktop app's bundled CLI also works), Node.js 20+, and a Codex desktop version supporting MCP Apps. Keep the extracted folder after installing the plugin, because it is the marketplace source.
+Add this GitHub project as a plugin marketplace in Codex desktop, then install **Codex Usage Compass**:
 
-Download and extract the release archive, then run from its folder:
+`https://github.com/NorthHarborLab/codex-usage-compass`
+
+The plugin contains the desktop renderer. Its first local MCP service startup automatically starts the ring, with no companion installation command. If the host has not loaded the service yet, open the quota panel once. Codex does not expose an install-completed callback; startup is tied to the loaded service. Local execution must be allowed by the host. Use signed-in local Codex and its bundled Node runtime, or Node.js 20+ for CLI setups.
+
+- **Ubuntu GNOME:** coloured top-panel ring and remaining quota. Requires GJS, GTK3, AppIndicator/Ayatana and the enabled GNOME AppIndicator extension. When packages are missing, click **Install desktop support** in the panel and approve the OS authorization dialog. This uses Ubuntu apt; a newly installed GNOME extension may require enabling it and logging in again.
+- **Windows 10 / 11:** native notification-area ring, hover summary, and left/right click menu for both windows, countdowns, advice, refresh and language. Check the taskbar's `^` hidden-icon area if necessary. Uses built-in Windows PowerShell 5.1 and .NET Framework; no GJS, Python, or execution-policy changes. Native Windows Codex is required; remote Linux/WSL sessions cannot directly render this tray.
+
+Multiple chats share one ring. Hide it from the menu or panel and restore it from the panel. The choice persists. The ring exits after all plugin services stop; closing only the quota panel does not unload the service. No extra login task, registry startup entry, or system service is created. Upgrading stops this project's legacy standalone Linux service to prevent duplicate icons.
+
+Optional local-archive installation:
 
 ```sh
-sh scripts/install-linux.sh plugin
+sh scripts/install-linux.sh
 ```
 
-Open the plugin **Codex Usage Compass** from the desktop sidebar, or ask Codex to open the usage rings. If the previous title “Codex 周额度” is cached, reopen the app. Local tool startup must be permitted by your host.
-
-For the Ubuntu top-panel indicator, install desktop dependencies:
-
-```sh
-sudo apt install gjs gir1.2-gtk-3.0 gir1.2-appindicator3-0.1 gnome-shell-extension-appindicator
-sh scripts/install-linux.sh indicator
-```
-
-On distributions providing Ayatana instead, install `gir1.2-ayatanaappindicator3-0.1`. The indicator supports either typelib. Enable the AppIndicator GNOME extension if it is disabled. Ubuntu normally includes it.
-
-The installer copies the indicator into `~/.local/share/codex-weekly-usage`, installs a user systemd service, and enables it for graphical logins. Click the coloured ring in the system top panel to open the quota menu while keeping your chat visible. The icon follows the available window with the lowest budget coverage. The menu includes a refresh action and language selector.
-
-Run both installers with `sh scripts/install-linux.sh all`. Updates use the same command from the new release folder.
+Keep the source directory for local marketplaces. The `all` alias also installs the self-contained plugin. Only the explicit legacy `indicator` mode installs a separate systemd companion.
 
 ### Uninstall
 
+Uninstall in Codex plugin management. The ring exits when the service unloads; an existing chat connection may require closing or restarting Codex. To clean an older standalone installation:
+
 ```sh
 sh scripts/uninstall-linux.sh all
-# Or uninstall one component:
-sh scripts/uninstall-linux.sh indicator
-sh scripts/uninstall-linux.sh plugin
 ```
 
-The language preference is kept at `~/.config/codex-weekly-usage-language`. Remove that file to reset the indicator language. The marketplace registration can be removed with `codex plugin marketplace remove weekly-usage-local`.
+Preferences remain at `~/.config/codex-usage-compass/preferences.json` on Linux or `%LOCALAPPDATA%\codex-usage-compass\preferences.json` on Windows. Remove this file to restore automatic display.
 
 ## Languages
 
@@ -66,7 +61,7 @@ This is a steady-pacing heuristic. It does not learn habits or predict model cos
 
 ## Platform support
 
-Ubuntu GNOME 50 is the tested release target. The plugin launcher uses a POSIX shell. The top-panel companion uses GJS, GTK3, AppIndicator, and systemd. Windows and macOS desktop companions are not implemented or tested in this release.
+Ubuntu GNOME uses GJS/GTK3/AppIndicator; Windows 10+ uses native WinForms NotifyIcon. The Windows smoke and lifecycle tests run on GitHub Actions Windows Server 2022. Windows 10/11 interactive desktop acceptance is still pending. macOS has no system-ring implementation. See VERIFICATION.md for exact coverage.
 
 Each user must sign into their own Codex account. Current accounts may return only a weekly limit. The 5-hour path is tested with fixtures until the account supplies that window.
 

@@ -2,42 +2,39 @@
 
 [English](README.md)
 
-[Download v0.3.2](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.3.2)
+[Download v0.4.0](https://github.com/NorthHarborLab/codex-usage-compass/releases/tag/v0.4.0)
 显示 7 天与 5 小时额度圆环，结合剩余时间给出模型和速度建议。Ubuntu 顶栏小组件可随手展开，查看时保留当前聊天页面。
 
-## 安装
+## 安装一次，自动带上系统圆环
 
-先安装并登录 Codex CLI，准备 Node.js 20 以上版本。Codex 桌面自带的 CLI 和 Node.js 也可使用。下载 Release 压缩包并解压，在解压目录执行：
+在 Codex 桌面的插件管理中添加此项目作为插件市场，然后安装 **Codex Usage Compass / Codex 额度指南**：
+
+`https://github.com/NorthHarborLab/codex-usage-compass`
+
+插件包已经包含系统圆环。安装后首次加载本地插件服务时，圆环自动启动，不需要另外运行组件安装命令。若 Codex 尚未加载服务，打开一次「Codex 额度指南」面板即可触发。这里使用本地 MCP 服务启动入口，安装按钮本身没有可供插件使用的安装完成回调。登录和运行环境由本机 Codex 提供；命令行环境需准备 Node.js 20+ 与已登录的 Codex。
+
+- **Ubuntu GNOME**：顶栏显示彩色圆环与余量，点击查看详情。需要 GJS、GTK3、AppIndicator 和已启用的 GNOME AppIndicator 扩展。缺少软件包时，可在面板点「安装桌面支持」，通过系统授权窗口安装，不需要输入终端命令。扩展初次安装后可能需重新登录桌面并启用。支持自动安装依赖的发行版限使用 apt 的 Ubuntu。
+- **Windows 10 / 11**：使用原生通知区域圆环。左键或右键展开双额度、倒计时、建议、刷新和语言菜单；悬停显示摘要。首次运行图标可能被 Windows 收进任务栏的 `^` 隐藏图标区。使用系统自带 Windows PowerShell 5.1 和 .NET Framework，无需另装 GJS 或 Python，也不修改 PowerShell 执行策略。需运行本机 Windows Codex，WSL 和远程 Linux 会话不能直接显示 Windows 托盘。
+
+多个聊天共用一个圆环。面板和系统菜单均可隐藏圆环，偏好会保存；在面板点「显示系统圆环」即可恢复。圆环随插件服务运行，所有插件服务退出后结束；不额外创建开机启动任务、注册表启动项或后台服务。关闭面板本身不会停止已加载的插件服务。升级自旧版时，会停用本项目旧的独立 systemd 圆环服务，防止重复图标。
+
+从本地压缩包安装的备用方式（可选）：
 
 ```sh
-sh scripts/install-linux.sh plugin
+sh scripts/install-linux.sh
 ```
 
-在桌面侧栏打开 **Codex 额度指南 / Codex Usage Compass**，或在聊天中要求打开额度圆环。若仍显示旧名称「Codex 周额度」，重新打开桌面应用。请保留解压目录，它是本地插件市场来源。
-
-安装 Ubuntu 顶栏组件：
-
-```sh
-sudo apt install gjs gir1.2-gtk-3.0 gir1.2-appindicator3-0.1 gnome-shell-extension-appindicator
-sh scripts/install-linux.sh indicator
-```
-
-若系统使用 Ayatana，可改装 `gir1.2-ayatanaappindicator3-0.1`。组件兼容两种接口。需要启用 GNOME 的 AppIndicator 扩展，Ubuntu 通常已自带。
-
-组件安装到 `~/.local/share/codex-weekly-usage`，通过用户级 systemd 服务在登录桌面时启动。顶栏显示彩色圆环和余量，单击展开两个周期的数据、倒计时、建议、刷新与语言选项。两个周期都有数据时，图标优先展示覆盖率较低的周期。
-
-同时安装两部分可执行 `sh scripts/install-linux.sh all`。升级时，在新版本目录重新执行同一命令。
+保留本地市场来源目录。`all` 参数同样安装自带圆环的插件；旧的独立 Linux 服务仅在明确使用 `indicator` 参数时安装。
 
 ## 卸载
 
+在 Codex 插件管理中卸载即可；服务卸载或停止加载后，圆环自动退出。运行中的聊天若仍保留旧插件连接，可关闭该连接或重新打开 Codex。独立安装的旧版服务也可通过以下脚本清理：
+
 ```sh
 sh scripts/uninstall-linux.sh all
-# 只卸载顶栏或插件：
-sh scripts/uninstall-linux.sh indicator
-sh scripts/uninstall-linux.sh plugin
 ```
 
-语言偏好保留在 `~/.config/codex-weekly-usage-language`，删除此文件即可恢复系统语言。市场注册可用 `codex plugin marketplace remove weekly-usage-local` 删除。
+偏好保留在 Linux 的 `~/.config/codex-usage-compass/preferences.json` 或 Windows 的 `%LOCALAPPDATA%\codex-usage-compass\preferences.json`。删除偏好文件可恢复默认自动显示。
 
 ## 颜色和建议
 
@@ -60,7 +57,7 @@ sh scripts/uninstall-linux.sh plugin
 
 面板及顶栏完整支持简体中文和英文，可手动切换。其他语言回退英文，其他中文地区设置使用简体中文。面板跟随浏览器语言，顶栏跟随系统语言，手动选择会在存储可用时保留。
 
-本次发布验证了 Ubuntu GNOME 50。Windows 和 macOS 顶栏/托盘尚未实现，也未进行平台测试。5 小时窗口已用模拟数据测试，当前实际账户只返回周额度。
+Ubuntu GNOME 已进行隔离插件安装和实际系统托盘协议测试。Windows 实现面向 Windows 10 及以上，原生冒烟测试和生命周期测试的结果见 VERIFICATION.md；尚无 Windows 10/11 人工桌面验收。macOS 系统圆环未实现。5 小时窗口使用模拟数据测试，当前实际账户只返回周额度。
 
 ## 数据与开发
 

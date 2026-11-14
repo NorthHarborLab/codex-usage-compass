@@ -12,6 +12,8 @@ await mkdir(join(home,'.codex'), {recursive:true});
 await cp(process.cwd(), source, { recursive:true, filter:path=>!path.includes('/node_modules')&&!path.includes('/.git/')&&!path.endsWith('/.git') });
 const env = { ...process.env, HOME:home, CODEX_HOME:join(home,'.codex'), USAGE_TRAY_DISABLED:'1', USAGE_LANGUAGE:'en' };
 execFileSync('sh',[join(source,'scripts/install-linux.sh'),'plugin'],{env,stdio:'pipe',timeout:60000});
+const configured = JSON.parse(execFileSync('codex', ['mcp','list','--json'], { env, encoding:'utf8' }));
+assert.ok(configured.some(s => s.name === 'weekly-usage' && s.enabled));
 const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.4.0');
 const client=new Client({name:'clean-install-test',version:'1.0.0'});
 await client.connect(new StdioClientTransport({command:process.execPath,args:['./dist/server.cjs'],cwd:cache,env}));

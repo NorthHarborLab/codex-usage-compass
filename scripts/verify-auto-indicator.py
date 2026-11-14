@@ -82,6 +82,21 @@ try:
     assert len(locks)==1
     owner=json.loads((locks[0]/"owner.json").read_text())["pid"]
     assert owner == process.pid
+    # The owner can exit while another chat remains loaded. The second takes over.
+    process.stdin.close()
+    process.wait(timeout=5)
+    time.sleep(6)
+    assert json.loads((locks[0]/"owner.json").read_text())["pid"] == second.pid
+    names = bus("call","org.freedesktop.DBus","/org/freedesktop/DBus","org.freedesktop.DBus","ListNames")[0]
+    for name in names:
+        if not name.startswith(":"): continue
+        try:
+            if bus("get-property",name,path,"org.kde.StatusNotifierItem","Id") == "codex-weekly-usage":
+                address=name
+                menu=bus("get-property",address,path,"org.kde.StatusNotifierItem","Menu")
+                break
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired): pass
+    assert any("重要任务" in v for v in rows().values())
     # Hide through the native menu; the next loaded plugin must respect it.
     hide=next(k for k,v in rows().items() if v=="隐藏系统圆环")
     subprocess.check_call(["busctl","--user","--","call",address,menu,"com.canonical.dbusmenu","Event","isvu",str(hide),"clicked","s","","0"])
@@ -89,7 +104,7 @@ try:
     prefs=root/"config/codex-usage-compass/preferences.json"
     assert json.loads(prefs.read_text())["enabled"] is False
     assert not list((root/"config/codex-usage-compass").glob("*.lock"))
-    print("Automatic Linux tray passed: plugin-only package, first load, fixture data, countdown, language, shared lock, hide and cleanup.")
+    print("Automatic Linux tray passed: plugin-only package, first load, fixture data, countdown, language, shared lock, owner handover, hide and cleanup.")
 finally:
     watcher.terminate()
     watcher.wait(timeout=5)
