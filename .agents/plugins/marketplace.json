@@ -1,0 +1,20 @@
+{
+  "name": "weekly-usage-local",
+  "interface": {
+    "displayName": "Codex Usage Compass"
+  },
+  "plugins": [
+    {
+      "name": "weekly-usage",
+      "source": {
+        "source": "local",
+        "path": "./plugins/weekly-usage"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

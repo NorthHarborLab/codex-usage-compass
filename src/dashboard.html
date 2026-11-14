@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex 周额度</title>
+  <!-- STYLE -->
+</head>
+<body>
+  <main id="dashboard">
+    <header>
+      <div>
+        <p class="eyebrow">CODEX</p>
+        <h1>额度概览</h1>
+      </div>
+      <div class="header-actions"><label><span id="language-label"></span> <select id="language"><option value="en">English</option><option value="zh-CN">简体中文</option></select></label>
+      <button id="refresh" type="button" disabled>
+        <span aria-hidden="true">↻</span> 刷新
+      </button></div>
+    </header>
+
+    <p id="partial" class="notice"></p>
+    <aside id="advice" role="status"></aside>
+    <div id="periods"></div>
+    <p id="notice" class="notice" role="status" hidden></p>
+    <template id="period-template">
+      <section class="overview">
+        <div class="chart" data-tone="neutral">
+          <div class="ring" aria-hidden="true"></div>
+          <div class="chart-copy">
+            <div class="remaining"><span data-field="remaining">—</span><span class="unit" data-field="unit" hidden>%</span></div>
+            <div class="chart-label">实际剩余</div>
+          </div>
+        </div>
+
+        <div class="details">
+          <h2 data-field="heading"></h2>
+          <p class="status" data-tone="neutral" role="status">正在读取</p>
+          <dl>
+            <div><dt>距重置</dt><dd data-field="countdown">—</dd></div>
+            <div><dt>按时间应留</dt><dd data-field="target">—</dd></div>
+            <div><dt>预算覆盖率</dt><dd data-field="coverage">—</dd></div>
+          </dl>
+        </div>
+      </section>
+    </template>
+
+    <footer>
+      <span id="updated"></span>
+      <details><summary id="legend-title"></summary><p id="formula"></p><ul id="bands"></ul><p id="forecast"></p></details>
+    </footer>
+  </main>
+  <!-- SCRIPT -->
+</body>
+</html>

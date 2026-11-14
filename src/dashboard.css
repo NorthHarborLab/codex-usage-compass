@@ -1,0 +1,195 @@
+:root {
+  color-scheme: light dark;
+  --page: #f5f7fa;
+  --panel: #fff;
+  --ink: #15212d;
+  --muted: #556574;
+  --line: #d9e1e7;
+  --track: #e5edf1;
+  --green: #43832e;
+  --forest: #14644e;
+  --cyan: #007888;
+  --blue: #3664c9;
+  --yellow: #9b7000;
+  --orange: #b64c1c;
+  --red: #ba354c;
+  --neutral: #647787;
+  font-family: "Inter", "Noto Sans CJK SC", system-ui, sans-serif;
+  font-synthesis: none;
+}
+:root[data-theme="dark"] {
+  --page: #151c24;
+  --panel: #1d2731;
+  --ink: #edf4f8;
+  --muted: #abbac6;
+  --line: #394654;
+  --track: #323f4a;
+  --green: #8ac95f;
+  --forest: #41a983;
+  --cyan: #57cad6;
+  --blue: #83a9ff;
+  --yellow: #e8be56;
+  --orange: #f69961;
+  --red: #ff8292;
+  --neutral: #acbac5;
+}
+[data-tone="green"] { --accent: var(--green); }
+[data-tone="forest"] { --accent: var(--forest); }
+[data-tone="cyan"] { --accent: var(--cyan); }
+[data-tone="blue"] { --accent: var(--blue); }
+[data-tone="yellow"] { --accent: var(--yellow); }
+[data-tone="orange"] { --accent: var(--orange); }
+[data-tone="red"] { --accent: var(--red); }
+[data-tone="neutral"] { --accent: var(--neutral); }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+}
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: max(24px, var(--safe-top, 0px)) max(20px, var(--safe-right, 0px))
+    max(18px, var(--safe-bottom, 0px)) max(20px, var(--safe-left, 0px));
+}
+header, footer, dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+header { align-items: center; margin-bottom: 16px; }
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  color: var(--muted);
+}
+h2 { margin: 0 0 7px; font-size: 19px; }
+#periods { display: grid; gap: 12px; }
+h1 { margin: 0; font-size: clamp(25px, 4vw, 32px); line-height: 1.2; }
+button {
+  flex: none;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--panel);
+  cursor: pointer;
+}
+button:disabled { cursor: default; opacity: .55; }
+button span { margin-right: 3px; font-size: 17px; }
+button:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(22px, 5vw, 54px);
+  padding: clamp(18px, 4.5vw, 34px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+@property --fill {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+.chart {
+  width: min(100%, 166px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+  transition: --fill 380ms ease;
+}
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  --unfilled: color-mix(in srgb, var(--accent) 18%, var(--track));
+  background: conic-gradient(var(--accent) 0 var(--fill), var(--unfilled) var(--fill) 100%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 15px), #000 calc(100% - 14px));
+}
+.chart-copy { position: relative; text-align: center; }
+.remaining { font-size: clamp(28px, 24cqi, 55px); font-weight: 740; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.unit { font-size: .48em; margin-inline-start: 2px; color: var(--muted); }
+.chart-label { font-size: 13px; margin-top: 5px; color: var(--muted); }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 8px;
+  padding: 5px 10px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+.status::before, li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+dl { margin: 0; }
+dl div { align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--line); }
+dl div:last-child { border-bottom: 0; }
+dt { color: var(--muted); font-size: 13px; flex: none; }
+dd {
+  margin: 0;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.notice { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+footer { align-items: baseline; flex-wrap: wrap; margin-top: 14px; color: var(--muted); font-size: 12px; }
+details > summary { color: var(--ink); cursor: pointer; }
+details:not([open]) { text-align: right; }
+details[open] { flex-basis: 100%; }
+details p { margin: 9px 0; line-height: 1.65; }
+ul { display: flex; flex-wrap: wrap; gap: 8px 15px; padding: 0; margin: 0; list-style: none; }
+li { display: flex; align-items: center; gap: 5px; }
+@media (max-width: 465px) {
+  .overview { grid-template-columns: 1fr; }
+  .chart { width: min(100%, 148px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart { transition: none; }
+}
+
+#advice { margin-top: 16px; padding: 14px; border-radius: 12px; line-height: 1.6; background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); padding: 5px; border-radius: 6px; }
+
+/* Keep guidance and both windows visible together on wide panels. */
+main { max-width: 1000px; }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.header-actions label { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+#advice { margin: 0 0 10px; font-size: 15px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); }
+#partial { margin: 0 0 16px; }
+#periods { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.overview { grid-template-columns: 1fr; gap: 20px; padding: 26px; }
+.chart { width: 170px; }
+.details h2 { font-size: 21px; }
+@media (max-width: 680px) {
+  #periods { grid-template-columns: 1fr; }
+  .overview { grid-template-columns: minmax(110px, .75fr) minmax(0, 1fr); padding: 18px; gap: 16px; }
+  .chart { width: 145px; max-width: 100%; }
+  h1 { font-size: 24px; }
+  header { align-items: flex-start; }
+  .header-actions { flex-direction: column; align-items: flex-end; gap: 6px; }
+  .header-actions label > span { display: none; }
+  dl div { display: block; padding: 8px 0; }
+  dd { text-align: left; margin-top: 3px; }
+}

@@ -1,0 +1,28 @@
+import { mkdtemp, cp, mkdir, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import assert from 'node:assert/strict';
+const root = await mkdtemp(join(tmpdir(), 'quota-clean-'));
+const home = join(root,'home');
+const source = join(root,'release');
+await mkdir(join(home,'.codex'), {recursive:true});
+await cp(process.cwd(), source, { recursive:true, filter:path=>!path.includes('/node_modules')&&!path.includes('/.git/')&&!path.endsWith('/.git') });
+const env = { ...process.env, HOME:home, CODEX_HOME:join(home,'.codex'), USAGE_INSTALL_ONLY:'1', USAGE_LANGUAGE:'en' };
+execFileSync('sh',[join(source,'scripts/install-linux.sh'),'all'],{env,stdio:'pipe',timeout:60000});
+const cache=join(home,'.codex/plugins/cache/weekly-usage-local/weekly-usage/0.3.2');
+const client=new Client({name:'clean-install-test',version:'1.0.0'});
+await client.connect(new StdioClientTransport({command:'sh',args:['./launch.sh','./dist/server.cjs'],cwd:cache,env}));
+try {
+  const {tools}=await client.listTools();
+  assert.ok(tools.some(t=>t.name==='show_weekly_usage'));
+  const result=await client.callTool({name:'show_weekly_usage',arguments:{}});
+  assert.ok(result.structuredContent.error, 'An isolated logged-out account should show an error');
+  assert.match(result.structuredContent.error,/usage|Codex/i);
+  const resource=await client.readResource({uri:'ui://weekly-usage/dashboard.html'});
+  assert.ok(resource.contents[0].text.includes('Codex Usage Compass'));
+}finally{await client.close();}
+await writeFile(join(root,'path'),home);
+console.log(root);

@@ -1,0 +1,13 @@
+{
+  "name": "weekly-usage",
+  "version": "0.3.2",
+  "description": "Local Codex usage rings and budget guidance.",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Codex Usage Compass",
+    "shortDescription": "Quota rings and pacing tips",
+    "longDescription": "Local 7-day and 5-hour quota rings, bilingual pacing guidance and an optional Ubuntu panel companion.",
+    "category": "Productivity",
+    "defaultPrompt": "Show my Codex quota rings and pacing advice"
+  }
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Codex weekly usage panel indicator
+PartOf=graphical-session.target
+After=graphical-session-pre.target
+
+[Service]
+ExecStart=/usr/bin/gjs -m "%h/.local/share/codex-weekly-usage/desktop/indicator.mjs"
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
