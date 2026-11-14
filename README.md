@@ -9,9 +9,9 @@ A local Codex plugin with 7-day and 5-hour budget rings, pacing suggestions, and
 
 ### Quota dashboard · demo data
 
-The dashboard shows both quota windows, colour-coded rings and pacing guidance. All values in this screenshot are synthetic demo data; the interface is shown in Simplified Chinese and also supports English.
+The dashboard shows both quota windows, colour-coded rings and pacing guidance. All values in this screenshot are synthetic demo data. The interface is shown in English; Simplified Chinese is also supported.
 
-![Quota dashboard with 7-day and 5-hour rings using synthetic demo data](docs/images/quota-dashboard-demo.jpg)
+![English quota dashboard with 7-day and 5-hour rings using synthetic demo data](docs/images/quota-dashboard-demo-en.jpg)
 
 ### Ubuntu system ring · privacy-redacted illustration
 
