@@ -17,6 +17,17 @@ export function companionPaths(env = process.env, platform = process.platform) {
   return { root, lock: join(root, `tray-${scope}.lock`), preferences: join(root, 'preferences.json') };
 }
 
+async function processIdentity(pid) {
+  if (process.platform !== 'linux') return null;
+  try {
+    const [boot, proc] = await Promise.all([
+      readFile('/proc/sys/kernel/random/boot_id', 'utf8'),
+      readFile(`/proc/${pid}/stat`, 'utf8'),
+    ]);
+    return `${boot.trim()}:${proc.slice(proc.lastIndexOf(')') + 2).split(' ')[19]}`;
+  } catch { return null; }
+}
+
 // Exclusive directory + live PID prevents duplicate icons across chats. A crashed
 // owner is recovered; a partially written lock is given time to finish first.
 export async function acquireLock(path) {
@@ -28,7 +39,12 @@ export async function acquireLock(path) {
     try { owner = JSON.parse(await readFile(join(path, 'owner.json'), 'utf8')); }
     catch { if (Date.now() - (await stat(path)).mtimeMs < 30_000) return null; }
     if (owner) {
-      try { process.kill(owner.pid, 0); return null; }
+      try {
+        process.kill(owner.pid, 0);
+        const identity = await processIdentity(owner.pid);
+        // A reused PID after a reboot is not the process that owns this lock.
+        if (!owner.identity || !identity || owner.identity === identity) return null;
+      }
       catch (failure) { if (failure.code !== 'ESRCH') return null; }
     }
     // Rename the stale lock before removal; contenders then race on mkdir only.
@@ -37,7 +53,7 @@ export async function acquireLock(path) {
     try { await rename(path, stale); await rm(stale, { recursive: true, force: true }); } catch {}
     return null;
   }
-  try { await writeFile(join(path, 'owner.json'), JSON.stringify({ pid: process.pid, token }), { mode: 0o600 }); }
+  try { await writeFile(join(path, 'owner.json'), JSON.stringify({ pid: process.pid, token, identity: await processIdentity(process.pid) }), { mode: 0o600 }); }
   catch (error) { await rm(path, { recursive: true, force: true }); throw error; }
   return async () => {
     try {

@@ -9,7 +9,7 @@ const home = await mkdtemp(join(tmpdir(), 'quota host 中文 '));
 const cli = process.argv[2];
 const command = cli ? process.execPath : 'codex';
 const prefix = cli ? [resolve(cli)] : [];
-const env = { ...process.env, HOME:home, USERPROFILE:home, LOCALAPPDATA:join(home,'AppData','Local'), CODEX_HOME:join(home,'.codex'), CODEX_MCP_NODE_PATH:process.execPath };
+const env = { ...process.env, HOME:home, USERPROFILE:home, LOCALAPPDATA:join(home,'AppData','Local'), CODEX_HOME:join(home,'.codex'), CODEX_MCP_NODE_PATH:process.execPath, USAGE_STARTUP_DISABLED:'1' };
 await mkdir(env.CODEX_HOME, {recursive:true});
 const run = args => execFileSync(command,[...prefix,...args],{env,encoding:'utf8',timeout:60000});
 run(['plugin','marketplace','add',process.cwd()]);
@@ -34,7 +34,7 @@ try {
           assert.ok(server,JSON.stringify(data));
           assert.equal(server.toolsError,null);
           assert.ok(server.tools.set_system_ring);
-          assert.equal(server.serverInfo.version,'0.5.0');
+          assert.equal(server.serverInfo.version,'0.5.1');
           resolve();
         }catch(error){reject(error);}
       }

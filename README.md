@@ -25,13 +25,13 @@ Add this GitHub project as a plugin marketplace in Codex desktop, then install *
 
 `https://github.com/NorthHarborLab/codex-usage-compass`
 
-The plugin contains the desktop renderer. Its first local MCP service startup automatically starts the ring, with no companion installation command. If the host has not loaded the service yet, open the quota panel once. Codex does not expose an install-completed callback; startup is tied to the loaded service. Local execution must be allowed by the host. Use signed-in local Codex and its bundled Node runtime, or Node.js 20+ for CLI setups.
+The plugin contains the desktop renderer. Its first local MCP service startup automatically starts the ring, with no companion installation command. On first installation, open the quota panel once if the host has not loaded the service yet. From 0.5.1, Ubuntu automatically registers a per-user login helper that waits for the local Codex/ChatGPT desktop and starts the ring without opening the panel again. Codex does not expose an install-completed callback; startup is tied to the loaded service. Local execution must be allowed by the host. Use signed-in local Codex and its bundled Node runtime, or Node.js 20+ for CLI setups.
 
 - **Ubuntu GNOME:** coloured top-panel ring and remaining quota. Requires GJS, GTK3, AppIndicator/Ayatana and the enabled GNOME AppIndicator extension. When packages are missing, click **Install desktop support** in the panel and approve the OS authorization dialog. This uses Ubuntu apt; a newly installed GNOME extension may require enabling it and logging in again.
 - **macOS (Intel and Apple Silicon):** native menu bar ring with remaining quota, hover summary and a click menu for countdowns, refresh, language and hide. Uses the built-in `/usr/bin/osascript` JavaScript bridge and AppKit; no Xcode, Homebrew package or separate companion app is required. Requires a local logged-in graphical session. Node.js comes from the Codex host when provided, otherwise Node.js 20+ must be available (Homebrew Node paths are also detected). The renderer does not automate other apps or request Accessibility / Screen Recording access. No login item or LaunchAgent is installed.
 - **Windows 10 / 11:** native notification-area ring, hover summary, and left/right click menu for both windows, countdowns, advice, refresh and language. Check the taskbar's `^` hidden-icon area if necessary. Uses built-in Windows PowerShell 5.1 and .NET Framework; no GJS, Python, or execution-policy changes. Native Windows Codex is required; remote Linux/WSL sessions cannot directly render this tray.
 
-Multiple chats share one ring. Hide it from the menu or panel and restore it from the panel. The choice persists. The ring exits after all plugin services stop; closing only the quota panel does not unload the service. No extra login task, registry startup entry, or system service is created. Upgrading stops this project's legacy standalone Linux service to prevent duplicate icons.
+Multiple chats share one ring. Hide it from the menu or panel and restore it from the panel. The choice persists. On Ubuntu, `~/.config/autostart/codex-usage-compass.desktop` starts a small helper at login. It keeps the ring running only while the local desktop app runs, does not launch Codex, and requires no system service or administrator permission. Windows/macOS still follow MCP service lifetime without installing login items. Upgrading stops this project's legacy standalone Linux service to prevent duplicate icons.
 
 Optional Ubuntu local-archive installation:
 
@@ -43,7 +43,7 @@ Keep the source directory for local marketplaces. The `all` alias also installs 
 
 ### Uninstall
 
-Uninstall in Codex plugin management. The ring exits when the service unloads; an existing chat connection may require closing or restarting Codex. To clean an older standalone installation:
+Uninstall in Codex plugin management. The ring exits when the service unloads; an existing chat connection may require closing or restarting Codex. On Ubuntu the helper removes its login entry after detecting an uninstall (checked while the desktop runs, within about 30 seconds). To remove the login entry immediately and clean an older standalone installation:
 
 ```sh
 sh scripts/uninstall-linux.sh all

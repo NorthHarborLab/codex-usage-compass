@@ -1,3 +1,11 @@
+# 0.5.1
+
+- Fix the Ubuntu ring disappearing until the quota panel is opened after desktop startup.
+- Register a per-user XDG login helper on first desktop plugin load; watch the graphical app, resolve the current installed package and share one ring across chats.
+- Recover stale Linux locks after reboot/PID reuse using boot and process-start identity.
+- Preserve hide preferences, retry startup failures, follow plugin updates and stop on disable/uninstall. Windows and macOS startup behavior is unchanged.
+- Add cold-start/reopen tests without panel or tool calls, including real Linux D-Bus menu verification.
+
 # 0.5.0
 
 - Add an automatically managed macOS AppKit menu bar ring for Intel and Apple Silicon, using the built-in JXA runtime.

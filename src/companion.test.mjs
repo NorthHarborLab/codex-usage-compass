@@ -37,6 +37,17 @@ test('Windows launcher keeps Unicode source paths in environment and changes no 
   assert.ok(!/ExecutionPolicy|Bypass/i.test(script));
   assert.match(script, /USAGE_TRAY_SOURCE/);
 });
+test('Linux lock recovers after reboot even when the old PID was reused', {skip: process.platform !== 'linux'}, async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'quota-reboot-'));
+  try {
+    const path = join(dir, 'lock'); await mkdir(path);
+    await writeFile(join(path, 'owner.json'), JSON.stringify({pid:process.pid,token:'previous-boot',identity:'previous-boot:123'}));
+    assert.equal(await acquireLock(path), null);
+    const owner = await acquireLock(path); assert.ok(owner);
+    assert.equal(await acquireLock(path), null);
+    await owner();
+  } finally { await rm(dir, {recursive:true,force:true}); }
+});
 test('native tray frame uses tightest quota, both languages, stale neutral and changing countdown', () => {
   const now = Date.now();
   const snapshot = {fetchedAtMs: now, windows: {weekly: {usedPercent:20,windowMinutes:10080,resetsAtMs:now+5040*60000},fiveHour:{usedPercent:90,windowMinutes:300,resetsAtMs:now+150*60000}}};

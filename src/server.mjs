@@ -1,4 +1,5 @@
 import { startCompanion } from './companion.mjs';
+import { installStartup } from './startup.mjs';
 import { z } from 'zod';
 import { t, systemLocale } from './i18n.mjs';
 import { readFile } from 'node:fs/promises';
@@ -9,8 +10,10 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { getUsage } from './account.mjs';
 import { QUOTA_PERIODS, usageStatus } from './usage.mjs';
 
-const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.5.0' });
+const server = new McpServer({ name: 'weekly-usage', title: t(systemLocale(), 'title'), version: '0.5.1' });
 const companion = startCompanion(__dirname);
+// Keep MCP initialization fast; desktop startup registration is independent.
+void installStartup(__dirname).catch(() => {});
 const resourceUri = 'ui://weekly-usage/dashboard.html';
 const viewPath = join(__dirname, 'dashboard.html');
 

@@ -19,6 +19,12 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Linux desktop startup without opening the plugin
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gjs gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 python3-gi dbus-x11 xvfb
+          xvfb-run -a dbus-run-session -- python3 scripts/verify-startup.py plugins/weekly-usage
       - name: Windows native icon and menu smoke test
         if: runner.os == 'Windows'
         shell: powershell

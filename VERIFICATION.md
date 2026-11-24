@@ -1,3 +1,10 @@
+# Verification for 0.5.1
+
+- 16 unit tests pass, including desktop start/stop/reopen without a panel, retry after a temporary configuration failure, singleton helper, disabled/removed plugin and changed install path.
+- Clean install and actual Codex loader tests pass with version 0.5.1.
+- `scripts/verify-startup.py` exercises the packaged helper in an isolated D-Bus session with a simulated desktop executable and account. It checks the native menu, countdown, hidden unavailable 5-hour rows, shutdown/reopen and persistent hide preference without opening a panel or making an MCP tool call.
+- Full logout/relogin or restarting the user’s active Codex desktop is not performed during the live chat. Windows/macOS native tests below are the previous 0.5.0 results; the new login helper is Linux-only.
+
 # Verification for 0.5.0
 
 Local environment: Ubuntu GNOME 50.1, GJS/GTK3/AppIndicator, the desktop's Codex CLI, Node.js 26.11.1. CI uses Node.js 20 on Ubuntu, Windows Server 2022, and macOS 15 (Apple Silicon and Intel).
@@ -20,7 +27,7 @@ Native Codex loader check also passed on Windows: https://github.com/NorthHarbor
 
 The Linux clean install uses an isolated application profile on the existing OS, rather than a new OS VM. GNOME integration is checked via D-Bus, with previous user confirmation of the panel's visual rendering. Windows CI is Windows Server 2022; interactive Windows 10/11 desktop acceptance, taskbar overflow placement and actual account usage on Windows remain unverified. Current live account data provides only the weekly window; five-hour tests use fixtures. The Ubuntu graphical authorization flow for dependency installation was not invoked on this already-provisioned machine. Newly installed GNOME extensions can need enabling/relogin. macOS uses a real AppKit menu and image in CI; personal Mac visual acceptance, menu bar overflow/notch placement, live account data and older macOS versions remain unverified.
 
-Automatic startup happens when Codex loads the local MCP service. There is no install-completed hook, and a host that defers local service startup can require opening the quota panel once. Disabling/uninstalling takes effect when the host unloads existing MCP connections. No registry startup key or new systemd service is installed by the automatic mode.
+For 0.5.0, automatic startup happened when Codex loaded the local MCP service. There is no install-completed hook, and a host that defers local service startup can require opening the quota panel once. Disabling/uninstalling takes effect when the host unloads existing MCP connections. No registry startup key or new systemd service is installed by the automatic mode.
 
 ## Reproduce
 

@@ -65,7 +65,7 @@ function readLimits() {
     send({
       id: 1,
       method: 'initialize',
-      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.5.0' } },
+      params: { clientInfo: { name: 'weekly-usage', title: 'Codex 用量', version: '0.5.1' } },
     });
   });
 }

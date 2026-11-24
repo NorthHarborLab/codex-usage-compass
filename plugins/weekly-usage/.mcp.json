@@ -21,7 +21,8 @@
         "USAGE_TRAY_DISABLED",
         "USAGE_LANGUAGE",
         "LANG",
-        "LC_ALL"
+        "LC_ALL",
+        "USAGE_STARTUP_DISABLED"
       ]
     }
   }

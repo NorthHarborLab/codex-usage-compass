@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "weekly-usage",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Local Codex usage rings and budget guidance.",
   "extensions": {
     "com.openai": {

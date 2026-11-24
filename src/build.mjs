@@ -19,6 +19,11 @@ const [html, css, view] = await Promise.all([
 ]);
 
 await Promise.all([
+  build({
+    entryPoints: [fileURLToPath(new URL('./startup-entry.mjs', import.meta.url))],
+    outfile: fileURLToPath(new URL('startup.cjs', dist)),
+    bundle: true, platform: 'node', target: 'node20', format: 'cjs', minify: true,
+  }),
   writeFile(new URL('dashboard.html', dist), html
     .replace('<!-- STYLE -->', () => `<style>${css}</style>`)
     .replace('<!-- SCRIPT -->', () => `<script>${view.outputFiles[0].text}</script>`)),

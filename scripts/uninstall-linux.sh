@@ -2,6 +2,7 @@
 set -eu
 mode=${1:-all}
 case "$mode" in all|plugin|indicator) ;; *) echo 'Usage: uninstall-linux.sh [all|plugin|indicator]' >&2; exit 2;; esac
+rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/autostart/codex-usage-compass.desktop"
 if [ "$mode" != plugin ]; then
   systemctl --user disable --now codex-weekly-usage-indicator.service || true
   rm -f "$HOME/.config/systemd/user/codex-weekly-usage-indicator.service"

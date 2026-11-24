@@ -1,11 +1,11 @@
 {
   "name": "codex-weekly-usage",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node src/build.mjs",
-    "test": "node --test src/usage.test.mjs src/companion.test.mjs"
+    "test": "node --test src/usage.test.mjs src/companion.test.mjs src/startup.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "1.7.5",

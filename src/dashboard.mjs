@@ -153,7 +153,7 @@ function applyContext(context) {
 }
 
 applyDocumentTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-const app = new App({ name: 'Codex 周额度', version: '0.4.0' }, { availableDisplayModes: ['inline', 'fullscreen'] });
+const app = new App({ name: 'Codex 周额度', version: '0.5.1' }, { availableDisplayModes: ['inline', 'fullscreen'] });
 let interval;
 let initialRead;
 app.ontoolresult = (result) => {
